@@ -69,12 +69,11 @@ class DefaultController {
         $price += $count * $item['price'];
       }
 
-//      TODO: compare price
-//      if ($price !== $info['price']) {
-//        return $request->withJson([
-//          'status' => 'change_price',
-//        ]);
-//      }
+      if ($price !== intval($info['price'])) {
+        return $response->withJson([
+          'status' => 'change_price',
+        ]);
+      }
 
       $id = $orders->insertGetId([
         'contact_name' => $info['name'],
