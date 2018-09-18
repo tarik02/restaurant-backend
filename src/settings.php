@@ -32,7 +32,7 @@ return [
 
     'uploads' => [
       'path' => __DIR__ . '/../public/uploads/',
-      'public' => '/uploads/',
+      'public' => '/',
     ],
   ],
 ];
