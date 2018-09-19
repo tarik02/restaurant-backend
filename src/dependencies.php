@@ -1,21 +1,22 @@
 <?php
 
 use App\Services\Uploads;
+use Illuminate\Database\Capsule\Manager;
 use Illuminate\Database\Events\QueryExecuted;
-use Psr\Container\ContainerInterface;
+use Illuminate\Database\Events\StatementPrepared;
+use Illuminate\Events\Dispatcher;
+use Phpmig\Adapter;
+use Slim\Container;
 use Slim\Http\Request;
 use Slim\Http\Response;
-use Illuminate\Events\Dispatcher;
-use Illuminate\Database\Capsule\Manager;
-use Illuminate\Database\Events\StatementPrepared;
 
 // DIC configuration
 
 $container = $app->getContainer();
 
 // monolog
-$container['logger'] = function ($c) {
-  $settings = $c->get('settings')['logger'];
+$container['logger'] = function (Container $container) {
+  $settings = $container->get('settings')['logger'];
   $logger = new Monolog\Logger($settings['name']);
 //  $logger->pushProcessor(new Monolog\Processor\UidProcessor());
   $logger->pushHandler(new Monolog\Handler\StreamHandler($settings['path'], $settings['level']));
@@ -23,13 +24,17 @@ $container['logger'] = function ($c) {
 };
 
 // Service factory for the ORM
-$container['db'] = function ($container) {
+$container['db'] = function (Container $container) {
   $capsule = new Manager();
-  $capsule->addConnection($container['settings']['db']);
+
+  $config = $container['settings']['db'];
+  $connection = $config['connections'][$config['connection']];
+  $capsule->addConnection($connection);
+  $capsule->setFetchMode(PDO::FETCH_ASSOC);
 
   $dispatcher = new Dispatcher();
-  $dispatcher->listen(StatementPrepared::class, function (StatementPrepared $event) {
-    $event->statement->setFetchMode(PDO::FETCH_ASSOC);
+  $dispatcher->listen(StatementPrepared::class, function (StatementPrepared $event) use ($capsule) {
+    $event->statement->setFetchMode($capsule->getContainer()['config']['database.fetch']);
   });
   $dispatcher->listen(QueryExecuted::class, function (QueryExecuted $event) use($container) {
     /** @var \Monolog\Logger $logger */
@@ -50,7 +55,18 @@ $container['db'] = function ($container) {
   return $capsule;
 };
 
-$container['uploads'] = function (ContainerInterface $container) {
+$container['phpmig.adapter'] = function (Container $container) {
+  /** @var Illuminate\Database\Capsule\Manager $capsule */
+  $capsule = $container->get('db');
+  $capsule->setFetchMode(PDO::FETCH_OBJ); // Adapter needs fetch mode object
+
+  return new Adapter\Illuminate\Database($capsule, 'migrations');
+};
+
+$container['phpmig.migrations_path'] = base_path() . '/migrations';
+$container['phpmig.migrations_template_path'] = $container['phpmig.migrations_path'] . DIRECTORY_SEPARATOR . '.template.php';
+
+$container['uploads'] = function (Container $container) {
   return new Uploads($container);
 };
 

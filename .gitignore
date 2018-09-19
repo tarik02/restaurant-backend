@@ -3,6 +3,7 @@
 !/logs/README.md
 
 .idea/
+.env
 db.sqlite
 
 public/uploads/
