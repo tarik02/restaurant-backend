@@ -4,22 +4,18 @@ use Phpmig\Migration\Migration;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Schema\Blueprint;
 
-class OrderPrice extends Migration {
-  /**
-   * Do the migration
-   */
+class AddOrdersStatusDriverId extends Migration {
   public function up() {
     Capsule::schema()->table('orders', function(Blueprint $table) {
-      $table->integer('price')->default(0);
+      $table->integer('status')->default(0);
+      $table->integer('driver_id')->nullable();
     });
   }
-  
-  /**
-   * Undo the migration
-   */
+
   public function down() {
     Capsule::schema()->table('orders', function(Blueprint $table) {
-      $table->dropColumn('price');
+      $table->dropColumn('status');
+      $table->dropColumn('driver_id');
     });
   }
 }

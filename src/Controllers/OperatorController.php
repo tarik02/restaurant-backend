@@ -67,7 +67,7 @@ class OperatorController {
     $courses = DB::table('courses')->orderBy('id', 'desc')->get();
     $coursesIds = $courses->pluck('id');
 
-    $ingredients = DB::table('courses_ingradients')
+    $ingredients = DB::table('courses_ingredients')
       ->whereIn('course_id', $coursesIds)
       ->get()
       ->groupBy('course_id');
@@ -134,7 +134,7 @@ class OperatorController {
     /** @noinspection PhpUnhandledExceptionInspection */
     return DB::connection()->transaction(function() use($id, $body, $images, $response) {
       $courses = DB::table('courses');
-      $coursesIngredients = DB::table('courses_ingradients');
+      $coursesIngredients = DB::table('courses_ingredients');
       $coursesImages = DB::table('courses_images');
 
       if ($id !== null) {
@@ -190,7 +190,7 @@ class OperatorController {
     $id = $request->getParsedBodyParam('id');
 
     DB::table('courses')->where('id', $id)->delete();
-    DB::table('courses_ingradients')->where('course_id', $id)->delete();
+    DB::table('courses_ingredients')->where('course_id', $id)->delete();
     DB::table('courses_images')->where('course_id', $id)->delete();
 
     return $response->withJson([
@@ -199,7 +199,7 @@ class OperatorController {
   }
 
   public function ingredients(Request $request, Response $response, array $args) {
-    $query = DB::table('ingradients');
+    $query = DB::table('ingredients');
 
     $all = $request->getParam('all', 'false') === 'true';
 
@@ -246,7 +246,7 @@ class OperatorController {
   }
 
   public function ingredientSave(Request $request, Response $response, array $args) {
-    $ingredients = DB::table('ingradients');
+    $ingredients = DB::table('ingredients');
 
     $body = $request->getParsedBody();
     $id = $body['id'] ?? null;
@@ -278,8 +278,8 @@ class OperatorController {
       ]);
     }
 
-    $ingredients = DB::table('ingradients');
-    $coursesIngredients = DB::table('courses_ingradients');
+    $ingredients = DB::table('ingredients');
+    $coursesIngredients = DB::table('courses_ingredients');
 
     if ($ingredients->delete($id) !== 1) {
       return $response->withJson([

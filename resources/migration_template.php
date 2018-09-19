@@ -13,9 +13,6 @@ use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Schema\Blueprint;
 
 class <?=$class?> extends Migration {
-  /**
-   * Do the migration
-   */
   public function up() {
 <?php if (!$update): ?>
     Capsule::schema()->create('<?=addslashes($table)?>', function(Blueprint $table) {
@@ -28,10 +25,7 @@ class <?=$class?> extends Migration {
     });
 <?php endif ?>
   }
-  
-  /**
-   * Undo the migration
-   */
+
   public function down() {
 <?php if (!$update): ?>
     Capsule::schema()->drop('<?=addslashes($table)?>');

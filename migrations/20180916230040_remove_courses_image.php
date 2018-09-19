@@ -4,22 +4,16 @@ use Phpmig\Migration\Migration;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Schema\Blueprint;
 
-class CourseVisible extends Migration {
-  /**
-   * Do the migration
-   */
+class RemoveCoursesImage extends Migration {
   public function up() {
     Capsule::schema()->table('courses', function(Blueprint $table) {
-      $table->boolean('visible')->default(true);
+      $table->dropColumn('image');
     });
   }
-  
-  /**
-   * Undo the migration
-   */
+
   public function down() {
     Capsule::schema()->table('courses', function(Blueprint $table) {
-      $table->dropColumn('visible');
+      $table->string('image');
     });
   }
 }
