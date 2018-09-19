@@ -36,16 +36,14 @@ class MakeMigrationCommand extends Command {
     $templateFile = resources_path() . '/migration_template.php';
 
     $name = $input->getArgument('name');
+    $nameComponents = explode('_', $name);
 
-    $table = $input->getArgument('table');
-    if ($table === null) {
-      $table = array_slice(explode('_', $name), -1)[0];
-    }
+    $table = $input->getArgument('table') ?? $nameComponents[1] ?? '';
 
     $update = $input->getOption('update') !== false;
 
     $class = str_replace('_', '', ucwords($name, '_'));
-    $column = '';
+    $column = $nameComponents[count($nameComponents) - 1];
 
     ob_start();
     include $templateFile;
