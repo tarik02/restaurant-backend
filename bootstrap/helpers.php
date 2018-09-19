@@ -108,6 +108,17 @@ if (!function_exists('public_path')) {
   }
 }
 
+if (!function_exists('resources_path')) {
+  /**
+   * Get the path to the resources folder
+   *
+   * @return string
+   */
+  function resources_path() {
+    return base_path() . '/resources';
+  }
+}
+
 if (!function_exists('storage_path')) {
   /**
    * Get the path to the storage folder

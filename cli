@@ -3,12 +3,12 @@
 
 require 'vendor/autoload.php';
 
-use App\Commands\CreateMigrationCommand;
+use App\Commands\MakeMigrationCommand;
 use Phpmig\Console\Command;
 use Symfony\Component\Console\Application;
 
 $application = new Application();
-$application->add(new CreateMigrationCommand());
+$application->add(new MakeMigrationCommand());
 $application->addCommands(array(
 	new Command\InitCommand(),
 	new Command\StatusCommand(),
