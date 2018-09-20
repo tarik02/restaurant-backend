@@ -52,7 +52,7 @@ class MakeMigrationCommand extends Command {
     ob_end_clean();
 
     $directory = base_path() . '/migrations';
-    $stamp = date('Y_m_d_His');
+    $stamp = date('YmdHis');
     $file = "{$directory}/{$stamp}_{$name}.php";
 
     if (!file_exists($file)) {
