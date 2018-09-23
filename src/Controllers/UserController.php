@@ -15,6 +15,8 @@ class UserController extends Controller {
   protected $users;
 
   public function __construct(Container $container) {
+    parent::__construct($container);
+
     $this->container = $container;
     $this->users = $container['users'];
   }

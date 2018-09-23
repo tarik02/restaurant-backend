@@ -6,21 +6,23 @@ use App\Util\Format;
 use App\Util\OrderStatus;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Collection;
-use Psr\Container\ContainerInterface;
+use Slim\Container;
 use Slim\Http\Request;
 use Slim\Http\Response;
 use Slim\Http\UploadedFile;
 
 class OperatorController extends Controller {
-  /** @var ContainerInterface */
+  /** @var Container */
   protected $container;
 
   /** @var Uploads */
   protected $uploads;
 
-  public function __construct(ContainerInterface $container) {
+  public function __construct(Container $container) {
+    parent::__construct($container);
+
     $this->container = $container;
-    $this->uploads = $this->container->get('uploads');
+    $this->uploads = $this->container['uploads'];
   }
 
   public function orders(Request $request, Response $response, array $args) {
