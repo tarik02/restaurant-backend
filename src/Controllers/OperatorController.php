@@ -11,7 +11,7 @@ use Slim\Http\Request;
 use Slim\Http\Response;
 use Slim\Http\UploadedFile;
 
-class OperatorController {
+class OperatorController extends Controller {
   /** @var ContainerInterface */
   protected $container;
 
@@ -24,6 +24,8 @@ class OperatorController {
   }
 
   public function orders(Request $request, Response $response, array $args) {
+    $this->assertRole($request, $response, 'operator');
+
     $page = $request->getParsedBodyParam('page', 1);
     $perPage = $this->bound(5, 50, $request->getParsedBodyParam('perPage', 15));
     $filter = $request->getParsedBodyParam('filter', 1);
@@ -64,6 +66,8 @@ class OperatorController {
   }
 
   public function courses(Request $request, Response $response, array $args) {
+    $this->assertRole($request, $response, 'operator');
+
     $courses = DB::table('courses')->orderBy('id', 'desc')->get();
     $coursesIds = $courses->pluck('id');
 
@@ -111,6 +115,8 @@ class OperatorController {
   }
 
   public function courseSave(Request $request, Response $response, array $args) {
+    $this->assertRole($request, $response, 'operator');
+
     $body = json_decode($request->getParsedBodyParam('data'), true);
     $files = $request->getUploadedFiles()['files'] ?? [];
 
@@ -187,6 +193,8 @@ class OperatorController {
   }
 
   public function courseRemove(Request $request, Response $response, array $args) {
+    $this->assertRole($request, $response, 'operator');
+
     $id = $request->getParsedBodyParam('id');
 
     DB::table('courses')->where('id', $id)->delete();
@@ -199,6 +207,8 @@ class OperatorController {
   }
 
   public function ingredients(Request $request, Response $response, array $args) {
+    $this->assertRole($request, $response, 'operator');
+
     $query = DB::table('ingredients');
 
     $all = $request->getParam('all', 'false') === 'true';
@@ -246,6 +256,8 @@ class OperatorController {
   }
 
   public function ingredientSave(Request $request, Response $response, array $args) {
+    $this->assertRole($request, $response, 'operator');
+
     $ingredients = DB::table('ingredients');
 
     $body = $request->getParsedBody();
@@ -270,6 +282,8 @@ class OperatorController {
   }
 
   public function ingredientDelete(Request $request, Response $response, array $args) {
+    $this->assertRole($request, $response, 'operator');
+
     $id = intval($request->getParam('id'));
     if ($id === 0) {
       return $response->withJson([

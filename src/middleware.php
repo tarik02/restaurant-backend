@@ -1,5 +1,6 @@
 <?php
 
+use App\Middleware\ResponseExceptionMiddleware;
 use Slim\Http\Response;
 use Slim\Http\Request;
 use Tuupola\Middleware\CorsMiddleware;
@@ -18,3 +19,5 @@ $app->add(function(Request $request, Response $response, callable $next) {
 
   return $next($request, $response);
 });
+
+$app->add(new ResponseExceptionMiddleware());

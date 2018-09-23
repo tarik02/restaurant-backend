@@ -7,7 +7,7 @@ use Slim\Container;
 use Slim\Http\Request;
 use Slim\Http\Response;
 
-class UserController {
+class UserController extends Controller {
   /** @var Container */
   protected $container;
 

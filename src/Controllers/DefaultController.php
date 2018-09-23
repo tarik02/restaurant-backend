@@ -8,7 +8,7 @@ use Illuminate\Support\Collection;
 use Slim\Http\Request;
 use Slim\Http\Response;
 
-class DefaultController {
+class DefaultController extends Controller {
   public function courses(Request $request, Response $response, array $args) {
     $result = DB::table('courses')
       ->where('visible', 1)
