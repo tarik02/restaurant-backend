@@ -3,7 +3,6 @@
 namespace App\Controllers;
 
 use App\Services\UsersService;
-use Chadicus\Slim\OAuth2\Middleware\Authorization;
 use Slim\Container;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -23,7 +22,7 @@ class UserController {
   public function register(Request $request, Response $response, array $args) {
     $body = $request->getParsedBody();
 
-    if ($this->users->exists($body['username'], $body['email'])) {
+    if ($this->users->exists($body['username'], $body['email'], $body['phone'])) {
       return $response->withJson([
         'status' => 'error',
         'reason' => 'already_exists',

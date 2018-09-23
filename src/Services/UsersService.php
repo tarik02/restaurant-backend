@@ -24,7 +24,7 @@ class UsersService implements UserCredentialsInterface {
     return $id;
   }
 
-  public function exists(?string $username, ?string $email) {
+  public function exists(?string $username, ?string $email, ?string $phone) {
     $builder = DB::table('users');
 
     if ($username !== null) {
@@ -33,6 +33,10 @@ class UsersService implements UserCredentialsInterface {
 
     if ($email !== null) {
       $builder->orWhereRaw('LOWER(email) = LOWER(?)', [$email]);
+    }
+
+    if ($phone !== null) {
+      $builder->orWhere('phone', $phone);
     }
 
     return $builder->exists();
