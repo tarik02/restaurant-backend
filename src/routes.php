@@ -2,6 +2,9 @@
 
 use App\Controllers\DefaultController;
 use App\Controllers\OperatorController;
+use App\Controllers\UserController;
+use Chadicus\Slim\OAuth2\Routes;
+use Chadicus\Slim\OAuth2\Middleware;
 use Slim\Http\Request;
 use Slim\Http\Response;
 
@@ -51,7 +54,25 @@ $app->get('/', function (Request $request, Response $response, array $args) {
 
 $app->group('/api/v1', function () use ($app) { //api
 
-  $app->group('', function () use ($app) { // user
+  $container = $app->getContainer();
+  $server = $container->get('oauth2-server');
+
+  $app->group('/auth', function () use ($app, $container, $server) {
+    $views = $container->get('oauth2-views');
+
+    $app->map(['GET', 'POST'], Routes\Authorize::ROUTE, new Routes\Authorize($server, $views))->setName('oauth2.authorize');
+    $app->post(Routes\Token::ROUTE, new Routes\Token($server))->setName('oauth2.token');
+    $app->map(['GET', 'POST'], Routes\ReceiveCode::ROUTE, new Routes\ReceiveCode($views))->setName('oauth2.receive-code');
+    $app->post('/register', UserController::class.':register');
+  });
+
+  $app->group('/user', function () use ($app, $server) { // user
+
+    $app->get('', UserController::class.':user');
+
+  })->add(new Middleware\Authorization($server, $container));
+
+  $app->group('', function () use ($app) { // default
     $app->get('/courses', DefaultController::class.':courses');
     $app->post('/order', DefaultController::class.':order');
     $app->get('/order/{id}/{token}', DefaultController::class.':orderWatch');
@@ -69,5 +90,5 @@ $app->group('/api/v1', function () use ($app) { //api
     $app->put('/ingredients', OperatorController::class.':ingredientSave');
     $app->delete('/ingredients', OperatorController::class.':ingredientDelete');
 
-  }); // TODO: middleware
+  });
 });

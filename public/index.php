@@ -9,14 +9,10 @@ if (PHP_SAPI == 'cli-server') {
     }
 }
 
+session_start();
+
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../bootstrap/app.php';
-
-// Register middleware
-require app_path() . '/middleware.php';
-
-// Register routes
-require app_path() . '/routes.php';
 
 // Run app
 $app->run();

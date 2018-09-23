@@ -55,6 +55,12 @@ $container['db'] = function (Container $container) {
   return $capsule;
 };
 
+$container['users'] = function (Container $container) {
+  $container->get('db');
+
+  return new \App\Services\UsersService($container);
+};
+
 $container['phpmig.adapter'] = function (Container $container) {
   /** @var Illuminate\Database\Capsule\Manager $capsule */
   $capsule = $container->get('db');
@@ -83,4 +89,31 @@ $container['phpErrorHandler'] = $container['errorHandler'] = function ($containe
       ->withStatus(500)
       ->withJson(['status' => 'error']);
   };
+};
+
+$container['oauth2-storage'] = function (Container $container) {
+  /** @var Manager $db */
+  $db = $container->get('db');
+  $pdo = $db->getConnection()->getPdo();
+
+  return new OAuth2\Storage\Pdo($pdo);
+};
+
+$container['oauth2-server'] = function (Container $container) {
+  $storage = $container->get('oauth2-storage');
+  $settings = $container->get('settings');
+  $usersService = $container->get('users');
+
+  return new OAuth2\Server(
+    $storage,
+    $settings['oauth2'],
+    [
+      new OAuth2\GrantType\RefreshToken($storage),
+      new OAuth2\GrantType\UserCredentials($usersService),
+    ]
+  );
+};
+
+$container['oauth2-views'] = function (Container $container) {
+  return new Slim\Views\PhpRenderer(base_path() . '/vendor/chadicus/slim-oauth2-routes/templates');
 };

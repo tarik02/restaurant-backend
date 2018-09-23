@@ -1,23 +1,4 @@
 #!/usr/bin/env php
 <?php
 
-require 'vendor/autoload.php';
-
-use App\Commands\MakeMigrationCommand;
-use Phpmig\Console\Command;
-use Symfony\Component\Console\Application;
-
-$application = new Application();
-$application->add(new MakeMigrationCommand());
-$application->addCommands(array(
-	new Command\InitCommand(),
-	new Command\StatusCommand(),
-	new Command\CheckCommand(),
-	new Command\GenerateCommand(),
-	new Command\UpCommand(),
-	new Command\DownCommand(),
-	new Command\MigrateCommand(),
-	new Command\RollbackCommand(),
-	new Command\RedoCommand()
-));
-$application->run();
+require_once 'bootstrap/cli.php';

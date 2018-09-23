@@ -18,14 +18,12 @@ return [
     'level' => \Monolog\Logger::DEBUG,
   ],
 
-  'db' => require_once 'db.php',
-
-  'cors' => [
-    'headers.allow' => ['content-type'],
-  ],
-
   'uploads' => [
     'path' => __DIR__ . '/../public/uploads/',
     'public' => '/',
   ],
+
+  'db' => require 'db.php',
+  'cors' => require 'cors.php',
+  'oauth2' => require 'oauth2.php',
 ];

@@ -1,5 +1,5 @@
 <?php
 
-require_once 'bootstrap/app.php';
+global $app;
 
 return $app->getContainer();

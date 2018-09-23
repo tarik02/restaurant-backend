@@ -100,7 +100,7 @@ class OperatorController {
 
           'ingredients' => $courseIngredients !== null
             ? $courseIngredients
-              ->pluck('amount', 'ingradient_id')
+              ->pluck('amount', 'ingredient_id')
               ->map(function($v) {
                 return floatval($v);
               })
@@ -161,7 +161,7 @@ class OperatorController {
             return [
               $ingredient => [
                 'course_id' => $id,
-                'ingradient_id' => $ingredient,
+                'ingredient_id' => $ingredient,
                 'amount' => $amount,
               ]
             ];
