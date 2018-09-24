@@ -21,7 +21,10 @@ $app->add(new CorsMiddleware(array_merge(
 $server = $container['oauth2-server'];
 $authMiddleware = new \Chadicus\Slim\OAuth2\Middleware\Authorization($server, $container, [null]);
 $app->add(function (Request $request, Response $response, callable $next) use ($authMiddleware) {
-  if ($request->getMethod() === 'OPTIONS') {
+  if (
+    $request->getMethod() === 'OPTIONS'
+    || !$request->hasHeader('Authorization')
+  ) {
     return $next($request, $response);
   }
 
