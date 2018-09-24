@@ -2,6 +2,7 @@
 
 use App\Controllers\DefaultController;
 use App\Controllers\OperatorController;
+use App\Controllers\StorageController;
 use App\Controllers\UserController;
 use Chadicus\Slim\OAuth2\Routes;
 use Chadicus\Slim\OAuth2\Middleware;
@@ -64,6 +65,7 @@ $app->group('/api/v1', function () use ($app) { //api
     $app->post(Routes\Token::ROUTE, new Routes\Token($server))->setName('oauth2.token');
     $app->map(['GET', 'POST'], Routes\ReceiveCode::ROUTE, new Routes\ReceiveCode($views))->setName('oauth2.receive-code');
     $app->post('/register', UserController::class.':register');
+
   });
 
   $app->group('/user', function () use ($app, $server) { // user
@@ -79,6 +81,11 @@ $app->group('/api/v1', function () use ($app) { //api
 
   });
 
+  $app->group('/storage', function () use ($app) { // storage
+    $app->get('', StorageController::class.':all');
+
+  });
+
   $app->group('/operator', function () use($app) { // operator
     $app->post('/orders', OperatorController::class . ':orders');
 
@@ -91,4 +98,5 @@ $app->group('/api/v1', function () use ($app) { //api
     $app->delete('/ingredients', OperatorController::class.':ingredientDelete');
 
   });
+
 });
