@@ -9,6 +9,8 @@ use Slim\Container;
 use Slim\Http\Request;
 
 class UsersService implements UserCredentialsInterface {
+  const ATTRIBUTE_KEY_USER = 'user-service.user';
+
   public function __construct(Container $container) {
   }
 
@@ -99,6 +101,10 @@ class UsersService implements UserCredentialsInterface {
   }
 
   public function getUserFromRequest(Request $request): ?array {
+    if (null !== $user = $request->getAttribute(self::ATTRIBUTE_KEY_USER)) {
+      return $user;
+    }
+
     $data = $request->getAttribute(Authorization::TOKEN_ATTRIBUTE_KEY);
     if ($data === null) {
       return null;

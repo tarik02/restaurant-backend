@@ -70,7 +70,7 @@ $app->group('/api/v1', function () use ($app) { //api
 
     $app->get('', UserController::class.':user');
 
-  })->add(new Middleware\Authorization($server, $container));
+  });
 
   $app->group('', function () use ($app) { // default
     $app->get('/courses', DefaultController::class.':courses');
