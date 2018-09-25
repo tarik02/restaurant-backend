@@ -29,7 +29,7 @@ class OperatorController extends Controller {
     $this->assertRole($request, $response, 'operator');
 
     $page = $request->getParsedBodyParam('page', 1);
-    $perPage = $this->bound(5, 50, $request->getParsedBodyParam('perPage', 15));
+    $perPage = clamp($request->getParsedBodyParam('perPage', 15), 5, 50);
     $filter = $request->getParsedBodyParam('filter', 1);
 
     $query = DB::table('orders')
@@ -224,7 +224,7 @@ class OperatorController extends Controller {
       }
 
       $page = intval($request->getParam('page', 1));
-      $perPage = $this->bound(5, 100, intval($request->getParam('perPage', 15)));
+      $perPage = clamp(intval($request->getParam('perPage', 15)), 5, 100);
 
       $query
         ->orderBy($sortBy, $descending ? 'desc' : 'asc')
@@ -309,10 +309,5 @@ class OperatorController extends Controller {
     return $response->withJson([
       'status' => 'ok',
     ]);
-  }
-
-
-  protected function bound(int $min, int $max, int $value) {
-    return min($max, max($min, $value));
   }
 }
