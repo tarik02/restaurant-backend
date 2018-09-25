@@ -16,9 +16,15 @@ abstract class Controller {
     $this->users = $container['users'];
   }
 
+
   protected function throwResponse(Response $response) {
     throw new ResponseException($response);
   }
+
+  protected function throwBadRequest(Response $response) {
+    $this->throwResponse($response->withStatus(400, 'Bad Request'));
+  }
+
 
   protected function getUser(Request $request): ?array {
     return $this->users->getUserFromRequest($request);

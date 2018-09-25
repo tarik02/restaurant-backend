@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Util\Format;
 use Slim\Http\Request;
 use Slim\Http\Response;
 use Illuminate\Database\Capsule\Manager as DB;
@@ -29,6 +30,64 @@ class StorageController extends Controller {
             'latitude' => floatval($storage['latitude']),
             'longitude' => floatval($storage['longitude']),
           ],
+        ];
+      }),
+
+      'meta' => [
+        'page' => $page,
+        'perPage' => $perPage,
+        'totalCount' => $total,
+      ],
+    ]);
+  }
+
+//  public function get(Request $request, Response $response, array $args) {
+//    $this->assertRole($request, $response, 'storage');
+//
+//    $id = $request->getParam('id');
+//    $storage = DB::table('storages')->find($id);
+//
+//    return $response->withJson([
+//      'data' => [
+//        'id' => intval($storage['id']),
+//        'name' => $storage['name'],
+//
+//        'location' => [
+//          'latitude' => floatval($storage['latitude']),
+//          'longitude' => floatval($storage['longitude']),
+//        ],
+//      ],
+//    ]);
+//  }
+
+  public function getBatches(Request $request, Response $response, array $args) {
+    $this->assertRole($request, $response, 'storage');
+
+    $id = $request->getParam('id');
+
+    $storage = DB::table('storages')->find($id, ['id']);
+    if ($storage === null) {
+      $this->throwBadRequest($response);
+    }
+
+    $page = intval($request->getParam('page', 1));
+    $perPage = clamp(intval($request->getParam('perPage', 15)), 5, 100);
+
+    $query = DB::table('storages_batches')->where('storage_id', $storage['id']);
+    $query->forPage($page, $perPage);
+
+    $total = $query->getCountForPagination();
+    $batches = $query->get();
+
+    return $response->withJson([
+      'data' => $batches->map(function (array $batch) {
+        return [
+          'ingredient_id' => intval($batch['ingredient_id']),
+
+          'count' => $batch['count'],
+          'remaining' => $batch['remaining'],
+
+          'best_by' => Format::dateTime($batch['best_by']),
         ];
       }),
 
