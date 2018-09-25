@@ -13,8 +13,8 @@ class StorageController extends Controller {
     $storages = DB::table('storages')
       ->get();
 
-    return $storages
-      ->map(function (array $storage) {
+    return $response->withJson(
+      $storages->map(function (array $storage) {
         return [
           'id' => intval($storage['id']),
           'name' => $storage['name'],
@@ -24,6 +24,7 @@ class StorageController extends Controller {
             'longitude' => floatval($storage['longitude']),
           ],
         ];
-      });
+      })
+    );
   }
 }
