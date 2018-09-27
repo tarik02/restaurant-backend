@@ -84,8 +84,8 @@ class StorageController extends Controller {
         return [
           'ingredient_id' => intval($batch['ingredient_id']),
 
-          'count' => $batch['count'],
-          'remaining' => $batch['remaining'],
+          'count' => floatval($batch['count']),
+          'remaining' => floatval($batch['remaining']),
 
           'best_by' => Format::dateTime($batch['best_by']),
         ];
