@@ -215,14 +215,14 @@ class OperatorController extends Controller {
 
     $all = $request->getParam('all', 'false') === 'true';
 
+    $sortBy = $request->getParam('sortBy', 'title');
+    $descending = $request->getParam('descending', 'false') === 'true';
+
+    if (!in_array($sortBy, ['title', 'price', 'unit'])) {
+      return $response->withStatus(500);
+    }
+
     if (!$all) {
-      $sortBy = $request->getParam('sortBy', 'title');
-      $descending = $request->getParam('descending', 'false') === 'true';
-
-      if (!in_array($sortBy, ['title', 'price', 'unit'])) {
-        return $response->withStatus(500);
-      }
-
       $page = intval($request->getParam('page', 1));
       $perPage = clamp(intval($request->getParam('perPage', 15)), 5, 100);
 
