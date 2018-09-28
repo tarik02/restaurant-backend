@@ -83,10 +83,11 @@ $app->group('/api/v1', function () use ($app) { //api
 
   $app->group('/storage', function () use ($app) { // storage
     $app->get('', StorageController::class.':all');
+    $app->get('/{id}', StorageController::class.':get');
     $app->put('', StorageController::class.':save');
     $app->delete('', StorageController::class.':delete');
 
-    $app->get('/batches', StorageController::class.':getBatches');
+    $app->get('/{id}/batches', StorageController::class.':getBatches');
   });
 
   $app->group('/operator', function () use($app) { // operator

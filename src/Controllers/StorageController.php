@@ -41,24 +41,24 @@ class StorageController extends Controller {
     ]);
   }
 
-//  public function get(Request $request, Response $response, array $args) {
-//    $this->assertRole($request, $response, 'storage');
-//
-//    $id = $request->getParam('id');
-//    $storage = DB::table('storages')->find($id);
-//
-//    return $response->withJson([
-//      'data' => [
-//        'id' => intval($storage['id']),
-//        'name' => $storage['name'],
-//
-//        'location' => [
-//          'latitude' => floatval($storage['latitude']),
-//          'longitude' => floatval($storage['longitude']),
-//        ],
-//      ],
-//    ]);
-//  }
+  public function get(Request $request, Response $response, array $args) {
+    $this->assertRole($request, $response, 'storage');
+
+    $id = $args['id'];
+    $storage = DB::table('storages')->find($id);
+
+    return $response->withJson([
+      'data' => [
+        'id' => intval($storage['id']),
+        'name' => $storage['name'],
+
+        'location' => [
+          'latitude' => floatval($storage['latitude']),
+          'longitude' => floatval($storage['longitude']),
+        ],
+      ],
+    ]);
+  }
 
   public function save(Request $request, Response $response, array $args) {
     $this->assertRole($request, $response, 'storage');
@@ -114,7 +114,7 @@ class StorageController extends Controller {
   public function getBatches(Request $request, Response $response, array $args) {
     $this->assertRole($request, $response, 'storage');
 
-    $id = $request->getParam('id');
+    $id = $args['id'];
 
     $storage = DB::table('storages')->find($id, ['id']);
     if ($storage === null) {
