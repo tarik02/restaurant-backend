@@ -60,45 +60,6 @@ class StorageController extends Controller {
 //    ]);
 //  }
 
-  public function getBatches(Request $request, Response $response, array $args) {
-    $this->assertRole($request, $response, 'storage');
-
-    $id = $request->getParam('id');
-
-    $storage = DB::table('storages')->find($id, ['id']);
-    if ($storage === null) {
-      $this->throwBadRequest($response);
-    }
-
-    $page = intval($request->getParam('page', 1));
-    $perPage = clamp(intval($request->getParam('perPage', 15)), 5, 100);
-
-    $query = DB::table('storages_batches')->where('storage_id', $storage['id']);
-    $query->forPage($page, $perPage);
-
-    $total = $query->getCountForPagination();
-    $batches = $query->get();
-
-    return $response->withJson([
-      'data' => $batches->map(function (array $batch) {
-        return [
-          'ingredient_id' => intval($batch['ingredient_id']),
-
-          'count' => floatval($batch['count']),
-          'remaining' => floatval($batch['remaining']),
-
-          'best_by' => Format::dateTime($batch['best_by']),
-        ];
-      }),
-
-      'meta' => [
-        'page' => $page,
-        'perPage' => $perPage,
-        'totalCount' => $total,
-      ],
-    ]);
-  }
-
   public function save(Request $request, Response $response, array $args) {
     $this->assertRole($request, $response, 'storage');
 
@@ -146,6 +107,54 @@ class StorageController extends Controller {
 
     return $response->withJson([
       'status' => 'ok',
+    ]);
+  }
+
+
+  public function getBatches(Request $request, Response $response, array $args) {
+    $this->assertRole($request, $response, 'storage');
+
+    $id = $request->getParam('id');
+
+    $storage = DB::table('storages')->find($id, ['id']);
+    if ($storage === null) {
+      $this->throwBadRequest($response);
+    }
+
+    $sortBy = $request->getParam('sortBy', 'best_by');
+    $descending = $request->getParam('descending', 'false') === 'true';
+
+    if (!in_array($sortBy, ['remaining', 'best_by'])) {
+      return $response->withStatus(500);
+    }
+
+    $page = intval($request->getParam('page', 1));
+    $perPage = clamp(intval($request->getParam('perPage', 15)), 5, 100);
+
+    $query = DB::table('storages_batches')->where('storage_id', $storage['id']);
+    $query = $query->orderBy($sortBy, $descending ? 'desc' : 'asc');
+    $query = $query->forPage($page, $perPage);
+
+    $total = $query->getCountForPagination();
+    $batches = $query->get();
+
+    return $response->withJson([
+      'data' => $batches->map(function (array $batch) {
+        return [
+          'ingredient_id' => intval($batch['ingredient_id']),
+
+          'count' => floatval($batch['count']),
+          'remaining' => floatval($batch['remaining']),
+
+          'best_by' => Format::dateTime($batch['best_by']),
+        ];
+      }),
+
+      'meta' => [
+        'page' => $page,
+        'perPage' => $perPage,
+        'totalCount' => $total,
+      ],
     ]);
   }
 }
