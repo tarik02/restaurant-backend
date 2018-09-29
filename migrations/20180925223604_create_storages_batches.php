@@ -7,6 +7,8 @@ use Illuminate\Database\Schema\Blueprint;
 class CreateStoragesBatches extends Migration {
   public function up() {
     Capsule::schema()->create('storages_batches', function(Blueprint $table) {
+      $table->increments('id');
+
       $table->integer('storage_id');
       $table->integer('ingredient_id');
 

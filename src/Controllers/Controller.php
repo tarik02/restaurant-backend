@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Exceptions\ResponseException;
+use App\Services\RolesService;
 use App\Services\UsersService;
 use Slim\Container;
 use Slim\Http\Request;
@@ -12,8 +13,12 @@ abstract class Controller {
   /** @var UsersService */
   private $users;
 
+  /** @var RolesService */
+  private $roles;
+
   public function __construct(Container $container) {
     $this->users = $container['users'];
+    $this->roles = $container['roles'];
   }
 
 
@@ -38,18 +43,18 @@ abstract class Controller {
     return $user;
   }
 
-  protected function checkRole(Request $request, string $role): bool {
+  protected function checkAbility(Request $request, string $name): bool {
     if (null === $user = $this->getUser($request)) {
       return false;
     }
 
-    return in_array($role, $user['roles']);
+    return $this->roles->checkAbility($user, $name);
   }
 
-  protected function assertRole(Request $request, Response $response, string $role) {
+  protected function assertAbility(Request $request, Response $response, string $name) {
     $user = $this->assertUser($request, $response);
 
-    if (!in_array($role, $user['roles'])) {
+    if (!$this->roles->checkAbility($user, $name)) {
       $this->throwResponse($response->withStatus(401, 'Unaccessible'));
     }
   }

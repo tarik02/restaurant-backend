@@ -2,14 +2,34 @@
 
 namespace App\Controllers;
 
-use App\Util\Format;
+use App\Util\Deserializer;
+use App\Util\Filterer;
+use App\Util\Serializer;
+use Slim\Container;
 use Slim\Http\Request;
 use Slim\Http\Response;
 use Illuminate\Database\Capsule\Manager as DB;
 
 class StorageController extends Controller {
+  /** @var Serializer */
+  private $serializer;
+
+  /** @var Deserializer */
+  private $deserializer;
+
+  /** @var Filterer */
+  private $filterer;
+
+  public function __construct(Container $container) {
+    parent::__construct($container);
+
+    $this->serializer = $container['serializer'];
+    $this->deserializer = $container['deserializer'];
+    $this->filterer = $container['filterer'];
+  }
+
   public function all(Request $request, Response $response, array $args) {
-    $this->assertRole($request, $response, 'storage');
+    $this->assertAbility($request, $response, 'storage');
 
     $page = intval($request->getParam('page', 1));
     $perPage = clamp(intval($request->getParam('perPage', 15)), 5, 100);
@@ -42,7 +62,7 @@ class StorageController extends Controller {
   }
 
   public function get(Request $request, Response $response, array $args) {
-    $this->assertRole($request, $response, 'storage');
+    $this->assertAbility($request, $response, 'storage');
 
     $id = $args['id'];
     $storage = DB::table('storages')->find($id);
@@ -61,7 +81,7 @@ class StorageController extends Controller {
   }
 
   public function save(Request $request, Response $response, array $args) {
-    $this->assertRole($request, $response, 'storage');
+    $this->assertAbility($request, $response, 'storage');
 
     $table = DB::table('storages');
 
@@ -86,7 +106,7 @@ class StorageController extends Controller {
   }
 
   public function delete(Request $request, Response $response, array $args) {
-    $this->assertRole($request, $response, 'storage');
+    $this->assertAbility($request, $response, 'storage');
 
     $id = intval($request->getParam('id'));
     if ($id === 0) {
@@ -105,6 +125,8 @@ class StorageController extends Controller {
       ]);
     }
 
+    DB::table('storages_batches')->where('storage_id', $id);
+
     return $response->withJson([
       'status' => 'ok',
     ]);
@@ -112,7 +134,7 @@ class StorageController extends Controller {
 
 
   public function getBatches(Request $request, Response $response, array $args) {
-    $this->assertRole($request, $response, 'storage');
+    $this->assertAbility($request, $response, 'storage');
 
     $id = $args['id'];
 
@@ -131,7 +153,10 @@ class StorageController extends Controller {
     $page = intval($request->getParam('page', 1));
     $perPage = clamp(intval($request->getParam('perPage', 15)), 5, 100);
 
+    $filter = $request->getParam('filter', []);
+
     $query = DB::table('storages_batches')->where('storage_id', $storage['id']);
+    $query = $this->filterer->filter($query, $filter);
     $query = $query->orderBy($sortBy, $descending ? 'desc' : 'asc');
     $query = $query->forPage($page, $perPage);
 
@@ -141,12 +166,14 @@ class StorageController extends Controller {
     return $response->withJson([
       'data' => $batches->map(function (array $batch) {
         return [
+          'id' => intval($batch['id']),
+
           'ingredient_id' => intval($batch['ingredient_id']),
 
           'count' => floatval($batch['count']),
           'remaining' => floatval($batch['remaining']),
 
-          'best_by' => Format::dateTime($batch['best_by']),
+          'best_by' => $this->serializer->dateTime($batch['best_by']),
         ];
       }),
 
@@ -155,6 +182,59 @@ class StorageController extends Controller {
         'perPage' => $perPage,
         'totalCount' => $total,
       ],
+    ]);
+  }
+
+  public function putBatch(Request $request, Response $response, array $args) {
+    $this->assertAbility($request, $response, 'storage');
+
+    $table = DB::table('storages_batches');
+
+    $storageId = $args['storage'];
+    $id = $args['id'] ?? null;
+    $body = $request->getParsedBody();
+
+    $data = [
+      'storage_id' => $storageId,
+      'ingredient_id' => $body['ingredient_id'],
+      'count' => $body['count'],
+      'remaining' => $body['remaining'],
+      'best_by' => $this->deserializer->dateTime($body['best_by'])->getTimestamp(),
+    ];
+    if ($id === null) {
+      $id = $table->insertGetId($data);
+    } else {
+      $table->where('id', $id)->update($data);
+    }
+
+    return $response->withJson([
+      'status' => 'ok',
+      'id' => $id,
+    ]);
+  }
+
+  public function deleteBatch(Request $request, Response $response, array $args) {
+    $this->assertAbility($request, $response, 'storage');
+
+    $id = intval($args['id']);
+    if ($id === 0) {
+      return $response->withJson([
+        'status' => 'error',
+        'reason' => 'bad_request',
+      ]);
+    }
+
+    $table = DB::table('storages_batches');
+
+    if ($table->delete($id) !== 1) {
+      return $response->withJson([
+        'status' => 'error',
+        'reason' => 'not_exist',
+      ]);
+    }
+
+    return $response->withJson([
+      'status' => 'ok',
     ]);
   }
 }

@@ -88,6 +88,8 @@ $app->group('/api/v1', function () use ($app) { //api
     $app->delete('', StorageController::class.':delete');
 
     $app->get('/{id}/batches', StorageController::class.':getBatches');
+    $app->put('/{storage}/batches[/{id}]', StorageController::class.':putBatch');
+    $app->delete('/{storage}/batches/{id}', StorageController::class.':deleteBatch');
   });
 
   $app->group('/operator', function () use($app) { // operator

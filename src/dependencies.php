@@ -117,3 +117,19 @@ $container['oauth2-server'] = function (Container $container) {
 $container['oauth2-views'] = function (Container $container) {
   return new Slim\Views\PhpRenderer(base_path() . '/vendor/chadicus/slim-oauth2-routes/templates');
 };
+
+$container['serializer'] = function (Container $container) {
+  return new \App\Util\Serializer();
+};
+
+$container['deserializer'] = function (Container $container) {
+  return new \App\Util\Deserializer();
+};
+
+$container['filterer'] = function (Container $container) {
+  return new \App\Util\Filterer();
+};
+
+$container['roles'] = function (Container $container) {
+  return new \App\Services\RolesService($container);
+};

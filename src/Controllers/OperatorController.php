@@ -2,7 +2,7 @@
 namespace App\Controllers;
 
 use App\Services\Uploads;
-use App\Util\Format;
+use App\Util\Serializer;
 use App\Util\OrderStatus;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Collection;
@@ -18,15 +18,19 @@ class OperatorController extends Controller {
   /** @var Uploads */
   protected $uploads;
 
+  /** @var Serializer */
+  private $serializer;
+
   public function __construct(Container $container) {
     parent::__construct($container);
 
     $this->container = $container;
     $this->uploads = $this->container['uploads'];
+    $this->serializer = $container['serializer'];
   }
 
   public function orders(Request $request, Response $response, array $args) {
-    $this->assertRole($request, $response, 'operator');
+    $this->assertAbility($request, $response, 'operator');
 
     $page = $request->getParsedBodyParam('page', 1);
     $perPage = clamp($request->getParsedBodyParam('perPage', 15), 5, 50);
@@ -51,7 +55,7 @@ class OperatorController extends Controller {
           'name' => $order['contact_name'],
           'phone' => $order['phone'],
 
-          'created_at' => Format::dateTime($order['created_at']),
+          'created_at' => $this->serializer->dateTime($order['created_at']),
           'price' => $order['price'],
           'status' => OrderStatus::toString($order['status']),
 
@@ -68,7 +72,7 @@ class OperatorController extends Controller {
   }
 
   public function courses(Request $request, Response $response, array $args) {
-    $this->assertRole($request, $response, 'operator');
+    $this->assertAbility($request, $response, 'operator');
 
     $courses = DB::table('courses')->orderBy('id', 'desc')->get();
     $coursesIds = $courses->pluck('id');
@@ -117,7 +121,7 @@ class OperatorController extends Controller {
   }
 
   public function courseSave(Request $request, Response $response, array $args) {
-    $this->assertRole($request, $response, 'operator');
+    $this->assertAbility($request, $response, 'operator');
 
     $body = json_decode($request->getParsedBodyParam('data'), true);
     $files = $request->getUploadedFiles()['files'] ?? [];
@@ -195,7 +199,7 @@ class OperatorController extends Controller {
   }
 
   public function courseRemove(Request $request, Response $response, array $args) {
-    $this->assertRole($request, $response, 'operator');
+    $this->assertAbility($request, $response, 'operator');
 
     $id = $request->getParsedBodyParam('id');
 
@@ -209,7 +213,7 @@ class OperatorController extends Controller {
   }
 
   public function ingredients(Request $request, Response $response, array $args) {
-    $this->assertRole($request, $response, 'operator');
+    $this->assertAbility($request, $response, 'operator');
 
     $query = DB::table('ingredients');
 
@@ -258,7 +262,7 @@ class OperatorController extends Controller {
   }
 
   public function ingredientSave(Request $request, Response $response, array $args) {
-    $this->assertRole($request, $response, 'operator');
+    $this->assertAbility($request, $response, 'operator');
 
     $ingredients = DB::table('ingredients');
 
@@ -284,7 +288,7 @@ class OperatorController extends Controller {
   }
 
   public function ingredientDelete(Request $request, Response $response, array $args) {
-    $this->assertRole($request, $response, 'operator');
+    $this->assertAbility($request, $response, 'operator');
 
     $id = intval($request->getParam('id'));
     if ($id === 0) {
