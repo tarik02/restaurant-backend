@@ -133,3 +133,7 @@ $container['filterer'] = function (Container $container) {
 $container['roles'] = function (Container $container) {
   return new \App\Services\RolesService($container);
 };
+
+$container['notifications'] = function (Container $container) {
+  return new \App\Services\NotificationsService($container);
+};

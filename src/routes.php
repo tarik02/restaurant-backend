@@ -1,6 +1,7 @@
 <?php
 
 use App\Controllers\DefaultController;
+use App\Controllers\NotificationController;
 use App\Controllers\OperatorController;
 use App\Controllers\StorageController;
 use App\Controllers\UserController;
@@ -71,6 +72,7 @@ $app->group('/api/v1', function () use ($app) { //api
   $app->group('/user', function () use ($app, $server) { // user
 
     $app->get('', UserController::class.':user');
+    $app->get('/notifications', NotificationController::class.':getAndFlush');
 
   });
 
