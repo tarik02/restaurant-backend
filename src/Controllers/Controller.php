@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Exceptions\ResponseException;
 use App\Services\RolesService;
 use App\Services\UsersService;
+use Illuminate\Database\Query\Builder;
 use Slim\Container;
 use Slim\Http\Request;
 use Slim\Http\Response;

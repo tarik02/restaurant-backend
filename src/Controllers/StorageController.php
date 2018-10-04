@@ -4,11 +4,14 @@ namespace App\Controllers;
 
 use App\Util\Deserializer;
 use App\Util\Filterer;
+use App\Util\Orderer;
+use App\Util\Paginator;
 use App\Util\Serializer;
+use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\Query\Builder;
 use Slim\Container;
 use Slim\Http\Request;
 use Slim\Http\Response;
-use Illuminate\Database\Capsule\Manager as DB;
 
 class StorageController extends Controller {
   /** @var Serializer */
@@ -143,22 +146,23 @@ class StorageController extends Controller {
       $this->throwBadRequest($response);
     }
 
-    $sortBy = $request->getParam('sortBy', 'best_by');
-    $descending = $request->getParam('descending', 'false') === 'true';
-
-    if (!in_array($sortBy, ['remaining', 'best_by'])) {
-      return $response->withStatus(500);
-    }
-
-    $page = intval($request->getParam('page', 1));
-    $perPage = clamp(intval($request->getParam('perPage', 15)), 5, 100);
-
-    $filter = $request->getParam('filter', []);
-
     $query = DB::table('storages_batches')->where('storage_id', $storage['id']);
-    $query = $this->filterer->filter($query, $filter);
-    $query = $query->orderBy($sortBy, $descending ? 'desc' : 'asc');
-    $query = $query->forPage($page, $perPage);
+    $query = $this->filterer->filter($query, $request->getParam('filter', []));
+
+    $order = (new Orderer())
+      ->allow('remaining')
+      ->allow('best_by')
+      ->by('best_by')
+      ->by($request->getParam('sortBy'))
+      ->descending($request->getParam('descending', 'false') === 'true')
+      ->apply($response, $query);
+
+    $pagination = (new Paginator())
+      ->minPerPage(5)
+      ->maxPerPage(100)
+      ->page(intval($request->getParam('page', 1)))
+      ->perPage(intval($request->getParam('perPage', 15)))
+      ->apply($response, $query);
 
     $total = $query->getCountForPagination();
     $batches = $query->get();
@@ -178,9 +182,10 @@ class StorageController extends Controller {
       }),
 
       'meta' => [
-        'page' => $page,
-        'perPage' => $perPage,
         'totalCount' => $total,
+
+        'order' => $order,
+        'pagination' => $pagination,
       ],
     ]);
   }
@@ -233,8 +238,73 @@ class StorageController extends Controller {
       ]);
     }
 
+    DB::table('storages_batches_old')->delete($id);
+
     return $response->withJson([
       'status' => 'ok',
+    ]);
+  }
+
+
+  public function getOldBatches(Request $request, Response $response, array $args) {
+    $this->assertAbility($request, $response, 'storage');
+
+    $query = DB::table('storages_batches')
+      ->whereIn('id', function (Builder $builder) {
+        $builder->select('id')->from('storages_batches_old');
+      });
+    $query = $this->filterer->filter($query, $request->getParam('filter', []));
+
+    $order = (new Orderer())
+      ->allow('remaining')
+      ->allow('best_by')
+      ->by('best_by')
+      ->by($request->getParam('sortBy'))
+      ->descending($request->getParam('descending', 'false') === 'true')
+      ->apply($response, $query);
+
+    $pagination = (new Paginator())
+      ->minPerPage(5)
+      ->maxPerPage(100)
+      ->page(intval($request->getParam('page', 1)))
+      ->perPage(intval($request->getParam('perPage', 15)))
+      ->apply($response, $query);
+
+    $total = $query->getCountForPagination();
+    $batches = $query->get();
+
+    $storageIds = $batches->pluck('storage_id')->map('intval')->unique();
+    $storages = DB::table('storages')
+      ->whereIn('id', $storageIds)
+      ->get()
+      ->pluck('name', 'id');
+
+    return $response->withJson([
+      'data' => $batches->map(function (array $batch) use ($storages) {
+        $storageId = intval($batch['storage_id']);
+
+        return [
+          'id' => intval($batch['id']),
+
+          'storage' => [
+            'id' => $storageId,
+            'name' => $storages[$storageId],
+          ],
+          'ingredient_id' => intval($batch['ingredient_id']),
+
+          'count' => floatval($batch['count']),
+          'remaining' => floatval($batch['remaining']),
+
+          'best_by' => $this->serializer->dateTime($batch['best_by']),
+        ];
+      }),
+
+      'meta' => [
+        'totalCount' => $total,
+
+        'order' => $order,
+        'pagination' => $pagination,
+      ],
     ]);
   }
 }
