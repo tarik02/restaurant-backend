@@ -3,8 +3,9 @@
 namespace App\Controllers;
 
 use App\Services\NotificationsService;
+use App\Services\Scheduler;
+use App\Tasks\TestTask;
 use App\Util\Serializer;
-use Illuminate\Database\Capsule\Manager as DB;
 use Slim\Container;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -31,7 +32,8 @@ class NotificationController extends Controller {
     return $response->withJson(
       $notifications->map(function (array $notification) {
         return [
-          'data' => json_decode($notification['data'], true),
+          'type' => $notification['type'],
+          'data' => $notification['data'],
           'created_at' => $this->serializer->dateTime($notification['created_at']),
         ];
       })

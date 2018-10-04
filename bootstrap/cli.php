@@ -2,6 +2,7 @@
 
 use App\Commands\MakeMigrationCommand;
 use App\Commands\RoutesListCommand;
+use App\Commands\WorkerCommand;
 use Phpmig\Console\Command;
 use Symfony\Component\Console\Application;
 
@@ -12,6 +13,7 @@ $application = new Application();
 $application->addCommands([
   new MakeMigrationCommand(),
   new RoutesListCommand($app),
+  new WorkerCommand($app),
 ]);
 
 $application->addCommands([

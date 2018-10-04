@@ -23,7 +23,9 @@
         "illuminate/events": "^5.7",
         "doctrine/dbal": "^2.8",
         "vlucas/phpdotenv": "^2.5",
-        "chadicus/slim-oauth2": "^3.1"
+        "chadicus/slim-oauth2": "^3.1",
+        "peppeocchi/php-cron-scheduler": "^2.3",
+        "jeremeamia/SuperClosure": "^2.4"
     },
     "require-dev": {
         "phpunit/phpunit": ">=4.8 < 6.0"

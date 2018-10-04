@@ -9,6 +9,7 @@ use Phpmig\Adapter;
 use Slim\Container;
 use Slim\Http\Request;
 use Slim\Http\Response;
+use SuperClosure\Serializer;
 
 // DIC configuration
 
@@ -36,17 +37,17 @@ $container['db'] = function (Container $container) {
   $dispatcher->listen(StatementPrepared::class, function (StatementPrepared $event) use ($capsule) {
     $event->statement->setFetchMode($capsule->getContainer()['config']['database.fetch']);
   });
-  $dispatcher->listen(QueryExecuted::class, function (QueryExecuted $event) use($container) {
-    /** @var \Monolog\Logger $logger */
-    $logger = $container->get('logger');
-    $logger->debug("Query executed ({$event->time}): {$event->sql}");
-    foreach ($event->bindings as $key => $value) {
-      if ($value instanceof DateTime) {
-        $value = $value->format(DateTime::ISO8601);
-      }
-      $logger->debug("$key => $value");
-    }
-  });
+//  $dispatcher->listen(QueryExecuted::class, function (QueryExecuted $event) use($container) {
+//    /** @var \Monolog\Logger $logger */
+//    $logger = $container->get('logger');
+//    $logger->debug("Query executed ({$event->time}): {$event->sql}");
+//    foreach ($event->bindings as $key => $value) {
+//      if ($value instanceof DateTime) {
+//        $value = $value->format(DateTime::ISO8601);
+//      }
+//      $logger->debug("$key => $value");
+//    }
+//  });
 
   $capsule->setEventDispatcher($dispatcher);
   $capsule->setAsGlobal();
@@ -136,4 +137,24 @@ $container['roles'] = function (Container $container) {
 
 $container['notifications'] = function (Container $container) {
   return new \App\Services\NotificationsService($container);
+};
+
+$container['scheduler'] = function (Container $container) {
+  return new \App\Services\Scheduler($container);
+};
+
+$container['scheduler.worker'] = function (Container $container) {
+  return new \App\Services\SchedulerWorker($container);
+};
+
+$container['super_closure.serializer'] = function (Container $container) {
+  return new Serializer(
+    new \SuperClosure\Analyzer\AstAnalyzer()
+  );
+};
+
+$container['super_closure'] = function (Container $container) {
+  return new Serializer(
+    new \SuperClosure\Analyzer\AstAnalyzer()
+  );
 };
