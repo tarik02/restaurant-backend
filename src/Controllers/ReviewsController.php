@@ -35,9 +35,7 @@ class ReviewsController extends Controller {
   }
 
   public function get(Request $request, Response $response, array $args) {
-//    $this->assertAbility($request, $response, 'reviews');
-
-    $id = $args['id'];
+    $this->assertAbility($request, $response, 'reviews');
 
     $query = $this->db->table('reviews');
     $query = $this->filterer->filter($query, $request->getParam('filter', []));
