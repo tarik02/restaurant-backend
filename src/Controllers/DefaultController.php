@@ -146,7 +146,7 @@ class DefaultController extends Controller {
             'lat' => floatval($order['latitude']),
             'lng' => floatval($order['longtitude']),
           ],
-          'totalDistance' => $order['totalDistance'],
+          'totalDistance' => $order['total_distance'],
         ];
       }
     }
