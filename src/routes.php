@@ -1,6 +1,7 @@
 <?php
 
 use App\Controllers\DefaultController;
+use App\Controllers\DriverController;
 use App\Controllers\NotificationController;
 use App\Controllers\OperatorController;
 use App\Controllers\StorageController;
@@ -94,6 +95,10 @@ $app->group('/api/v1', function () use ($app) { //api
     $app->delete('/{storage}/batches/{id}', StorageController::class.':deleteBatch');
 
     $app->get('/batches/old', StorageController::class.':getOldBatches');
+  });
+
+  $app->group('/driver', function () use ($app) { // driver
+    $app->post('/report-location', DriverController::class.':reportLocation');
   });
 
   $app->group('/operator', function () use($app) { // operator

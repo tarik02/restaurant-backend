@@ -27,8 +27,14 @@ abstract class Controller {
     throw new ResponseException($response);
   }
 
-  protected function throwBadRequest(Response $response) {
-    $this->throwResponse($response->withStatus(400, 'Bad Request'));
+  protected function throwBadRequest(Response $response, string $reason = 'Bad Request') {
+    $this->throwResponse($response->withStatus(400, $reason));
+  }
+
+  protected function assert(Response $response, $condition, string $reason = 'Bad Request') {
+    if (!$condition) {
+      $this->throwBadRequest($response, $reason);
+    }
   }
 
 

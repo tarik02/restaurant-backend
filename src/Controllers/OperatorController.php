@@ -63,7 +63,7 @@ class OperatorController extends Controller {
           'lat' => $order['latitude'],
           'lng' => $order['longtitude'],
 
-          'driver' => $order['driver_id'],
+          'driver_id' => $order['driver_id'],
         ];
       }),
 

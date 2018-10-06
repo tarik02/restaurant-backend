@@ -110,7 +110,6 @@ class DefaultController extends Controller {
     ['id' => $id, 'token' => $token] = $args;
 
     $orders = DB::table('orders');
-    $drivers = DB::table('drivers');
 
     $order = $orders->find($id);
     if ($order === null) {
@@ -129,16 +128,18 @@ class DefaultController extends Controller {
 
     $result = [];
     if (intval($order['status']) === OrderStatus::INROAD) {
-      $driver = $drivers->find($order['driver_id']);
+      $driverId = intval($order['driver_id']);
+      $user = DB::table('users')->where('id', $driverId)->first(['username']);
+      $driver = DB::table('drivers')->where('driver_id', $driverId)->first();
       if (null === $driver) {
         $order['status'] = OrderStatus::UNKNOWN;
       } else {
         $result = [
           'driver' => [
-            'id' => $driver['id'],
-            'name' => $driver['name'],
-            'lat' => floatval($driver['lat']),
-            'lng' => floatval($driver['lng']),
+            'id' => $driverId,
+            'name' => $user['username'],
+            'lat' => floatval($driver['latitude']),
+            'lng' => floatval($driver['longitude']),
           ],
           'target' => [
             'address' => $order['address'],
