@@ -158,3 +158,7 @@ $container['super_closure'] = function (Container $container) {
     new \SuperClosure\Analyzer\AstAnalyzer()
   );
 };
+
+$container['reviews'] = function (Container $container) {
+  return new \App\Services\ReviewsService($container);
+};

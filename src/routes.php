@@ -4,6 +4,7 @@ use App\Controllers\DefaultController;
 use App\Controllers\DriverController;
 use App\Controllers\NotificationController;
 use App\Controllers\OperatorController;
+use App\Controllers\OrderController;
 use App\Controllers\StorageController;
 use App\Controllers\UserController;
 use Chadicus\Slim\OAuth2\Routes;
@@ -79,8 +80,14 @@ $app->group('/api/v1', function () use ($app) { //api
 
   $app->group('', function () use ($app) { // default
     $app->get('/courses', DefaultController::class.':courses');
-    $app->post('/order', DefaultController::class.':order');
-    $app->get('/order/{id}/{token}', DefaultController::class.':orderWatch');
+
+  });
+
+  $app->group('/order', function () use ($app) { // order
+    $app->post('', OrderController::class.':order');
+    $app->get('/{id}/{token}', OrderController::class.':watch');
+    $app->post('/rate/{id}/{token}', OrderController::class.':rate');
+    $app->post('/dont-rate/{id}/{token}', OrderController::class.':dontRate');
 
   });
 
