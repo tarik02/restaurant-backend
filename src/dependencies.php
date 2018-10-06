@@ -162,3 +162,19 @@ $container['super_closure'] = function (Container $container) {
 $container['reviews'] = function (Container $container) {
   return new \App\Services\ReviewsService($container);
 };
+
+$container['resources'] = function (Container $container) {
+  return new \App\Services\ResourcesService($container);
+};
+
+$container['resource-user'] = function (Container $container) {
+  return new \App\Resources\UserResourceProvider($container);
+};
+
+$container['resource-driver'] = function (Container $container) {
+  return new \App\Resources\DriverResourceProvider($container);
+};
+
+$container['resource-order'] = function (Container $container) {
+  return new \App\Resources\OrderResourceProvider($container);
+};

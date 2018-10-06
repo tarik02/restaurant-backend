@@ -5,6 +5,7 @@ use App\Controllers\DriverController;
 use App\Controllers\NotificationController;
 use App\Controllers\OperatorController;
 use App\Controllers\OrderController;
+use App\Controllers\ReviewsController;
 use App\Controllers\StorageController;
 use App\Controllers\UserController;
 use Chadicus\Slim\OAuth2\Routes;
@@ -88,6 +89,11 @@ $app->group('/api/v1', function () use ($app) { //api
     $app->get('/{id}/{token}', OrderController::class.':watch');
     $app->post('/rate/{id}/{token}', OrderController::class.':rate');
     $app->post('/dont-rate/{id}/{token}', OrderController::class.':dontRate');
+
+  });
+
+  $app->group('/reviews', function () use ($app) { // reviews
+    $app->get('', ReviewsController::class.':get');
 
   });
 
