@@ -33,10 +33,9 @@ class ResourcesService {
     $provider = $this->getResourceProvider($type);
 
     if (($data = $provider->get($id)) !== null) {
-      return [
-        'type' => $type,
-        'data' => $data,
-      ];
+      $data['type'] = $type;
+
+      return $data;
     }
 
     return null;

@@ -19,8 +19,9 @@ class DriverResourceProvider implements ResourceProvider {
   }
 
   public function get(int $id): array {
-    return [
-      'user' => $this->resources->get('user', $id),
-    ];
+    return array_merge(
+      $this->resources->get('user', $id),
+      []
+    );
   }
 }
