@@ -7,7 +7,7 @@ use App\Util\Serializer;
 use Illuminate\Database\Connection;
 use Slim\Container;
 
-class OrderResourceProvider implements ResourceProvider {
+class OrderResourceProvider extends ResourceProvider {
   /** @var Connection */
   private $db;
 
@@ -20,8 +20,10 @@ class OrderResourceProvider implements ResourceProvider {
   }
 
   public function get(int $id): array {
-    $order = $this->db->table('orders')->find($id);
+    return $this->db->table('orders')->find($id);
+  }
 
+  public function fromDB(array $order): array {
     return [
       'id' => intval($order['id']),
       'contact_name' => $order['contact_name'],

@@ -5,7 +5,7 @@ namespace App\Resources;
 use Illuminate\Database\Connection;
 use Slim\Container;
 
-class UserResourceProvider implements ResourceProvider {
+class UserResourceProvider extends ResourceProvider {
   /** @var Connection */
   private $db;
 
@@ -14,8 +14,10 @@ class UserResourceProvider implements ResourceProvider {
   }
 
   public function get(int $id): array {
-    $user = $this->db->table('users')->find($id);
+    return $this->db->table('users')->find($id);
+  }
 
+  public function fromDB(array $user): array {
     return [
       'id' => intval($user['id']),
       'username' => $user['username'],

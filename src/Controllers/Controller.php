@@ -35,6 +35,8 @@ abstract class Controller {
     if (!$condition) {
       $this->throwBadRequest($response, $reason);
     }
+
+    return $condition;
   }
 
 

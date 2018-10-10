@@ -7,8 +7,9 @@ abstract class OrderStatus {
 
   const WAITING = 0;
   const COOKING = 1;
-  const INROAD = 2;
-  const DONE = 3;
+  const WAITING_FOR_DRIVER = 2;
+  const INROAD = 3;
+  const DONE = 4;
   
   public static function toString(int $value): string {
     switch ($value) {
@@ -17,6 +18,9 @@ abstract class OrderStatus {
 
       case self::COOKING:
         return 'cooking';
+
+      case self::WAITING_FOR_DRIVER:
+        return 'waiting_for_driver';
 
       case self::INROAD:
         return 'inroad';
@@ -35,6 +39,9 @@ abstract class OrderStatus {
 
       case 'cooking':
         return self::COOKING;
+
+      case 'waiting_for_driver':
+        return self::WAITING_FOR_DRIVER;
 
       case 'inroad':
         return self::INROAD;

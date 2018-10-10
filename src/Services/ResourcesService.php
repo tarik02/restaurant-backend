@@ -33,7 +33,12 @@ class ResourcesService {
     $provider = $this->getResourceProvider($type);
 
     if (($data = $provider->get($id)) !== null) {
+      $data = $provider->fromDB($data);
       $data['type'] = $type;
+
+      foreach ($provider->derived($data) as $item) {
+        $data = array_merge($item, $data);
+      }
 
       return $data;
     }

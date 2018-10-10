@@ -111,7 +111,11 @@ $app->group('/api/v1', function () use ($app) { //api
   });
 
   $app->group('/driver', function () use ($app) { // driver
+    $app->get('/dashboard', DriverController::class.':dashboard');
     $app->post('/report-location', DriverController::class.':reportLocation');
+
+    $app->post('/do-order/{id}', DriverController::class.':doOrder');
+
   });
 
   $app->group('/operator', function () use($app) { // operator
