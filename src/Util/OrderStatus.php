@@ -10,6 +10,7 @@ abstract class OrderStatus {
   const WAITING_FOR_DRIVER = 2;
   const INROAD = 3;
   const DONE = 4;
+  const CANCELLED = 5;
   
   public static function toString(int $value): string {
     switch ($value) {
@@ -27,6 +28,9 @@ abstract class OrderStatus {
 
       case self::DONE:
         return 'done';
+
+      case self::CANCELLED:
+        return 'cancelled';
     }
 
     return 'unknown';
@@ -48,6 +52,9 @@ abstract class OrderStatus {
 
       case 'done':
         return self::DONE;
+
+      case 'cancelled':
+        return self::CANCELLED;
     }
 
     return self::UNKNOWN;

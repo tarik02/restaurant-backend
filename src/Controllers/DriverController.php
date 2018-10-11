@@ -170,4 +170,64 @@ class DriverController extends Controller {
       ]);
     }, 5);
   }
+
+  public function cancelOrder(Request $request, Response $response, array $args) {
+    $this->assertAbility($request, $response, 'driver');
+    $user = $this->getUser($request);
+    $driver = $this->getDriver(intval($user['id']));
+
+    if ($driver['order_id'] === null) {
+      return $response->withJson([
+        'status' => 'error',
+        'reason' => 'no-order',
+      ]);
+    }
+
+    $order = $this->resources->get('order', $driver['order_id']);
+    $this->db->table('orders')
+      ->where('id', $order['id'])
+      ->update([
+        'status' => OrderStatus::CANCELLED,
+      ]);
+    $this->db->table('drivers')
+      ->where('driver_id', $driver['id'])
+      ->update([
+        'status' => DriverStatus::READY,
+        'order_id' => null,
+      ]);
+
+    return $response->withJson([
+      'status' => 'ok',
+    ]);
+  }
+
+  public function endOrder(Request $request, Response $response, array $args) {
+    $this->assertAbility($request, $response, 'driver');
+    $user = $this->getUser($request);
+    $driver = $this->getDriver(intval($user['id']));
+
+    if ($driver['order_id'] === null) {
+      return $response->withJson([
+        'status' => 'error',
+        'reason' => 'no-order',
+      ]);
+    }
+
+    $order = $this->resources->get('order', $driver['order_id']);
+    $this->db->table('orders')
+      ->where('id', $order['id'])
+      ->update([
+        'status' => OrderStatus::DONE,
+      ]);
+    $this->db->table('drivers')
+      ->where('driver_id', $driver['id'])
+      ->update([
+        'status' => DriverStatus::READY,
+        'order_id' => null,
+      ]);
+
+    return $response->withJson([
+      'status' => 'ok',
+    ]);
+  }
 }

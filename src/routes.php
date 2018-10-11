@@ -116,6 +116,9 @@ $app->group('/api/v1', function () use ($app) { //api
 
     $app->post('/do-order/{id}', DriverController::class.':doOrder');
 
+    $app->post('/cancel-order', DriverController::class.':cancelOrder');
+    $app->post('/end-order', DriverController::class.':endOrder');
+
   });
 
   $app->group('/operator', function () use($app) { // operator
