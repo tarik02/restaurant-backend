@@ -50,6 +50,7 @@ class StorageController extends Controller {
           'name' => $storage['name'],
 
           'location' => [
+            'address' => $storage['address'],
             'latitude' => floatval($storage['latitude']),
             'longitude' => floatval($storage['longitude']),
           ],
@@ -76,6 +77,7 @@ class StorageController extends Controller {
         'name' => $storage['name'],
 
         'location' => [
+          'address' => $storage['address'],
           'latitude' => floatval($storage['latitude']),
           'longitude' => floatval($storage['longitude']),
         ],
@@ -93,6 +95,7 @@ class StorageController extends Controller {
 
     $data = [
       'name' => $body['name'],
+      'address' => $body['location']['address'],
       'latitude' => $body['location']['latitude'],
       'longitude' => $body['location']['longitude'],
     ];
