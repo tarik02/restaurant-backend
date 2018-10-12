@@ -30,11 +30,11 @@ if (!function_exists('str_random')) {
   }
 }
 
+function rad(float $x) {
+  return $x * M_PI / 180;
+}
 function distanceBetweenTwoPoints($p1, $p2) {
   $R = 6378137; // Earth’s mean radius in meter
-  function rad(float $x) {
-    return $x * M_PI / 180;
-  }
 
   $dLat = rad($p2['lat'] - $p1['lat']);
   $dLng = rad($p2['lng'] - $p1['lng']);

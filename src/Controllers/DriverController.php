@@ -148,7 +148,7 @@ class DriverController extends Controller {
           'lng' => floatval($driver['longitude']),
         ], [
           'lat' => floatval($order['latitude']),
-          'lng' => floatval($order['longitude']),
+          'lng' => floatval($order['longtitude']),
         ]
       );
 
