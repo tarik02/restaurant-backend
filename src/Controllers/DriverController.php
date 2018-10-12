@@ -32,6 +32,7 @@ class DriverController extends Controller {
       $this->db->table('drivers')
         ->insert([
           'driver_id' => $id,
+          'status' => DriverStatus::READY,
         ]);
     }
 
@@ -163,6 +164,7 @@ class DriverController extends Controller {
         ->where('driver_id', $user['id'])
         ->update([
           'status' => DriverStatus::DRIVING,
+          'order_id' => $id,
         ]);
 
       return $response->withJson([
