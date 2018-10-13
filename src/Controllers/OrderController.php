@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Services\ReviewsService;
+use App\Services\StorageService;
 use App\Util\OrderStatus;
 use Illuminate\Database\Capsule\Manager as DB;
 use Slim\Container;
@@ -13,10 +14,14 @@ class OrderController extends Controller {
   /** @var ReviewsService */
   private $reviews;
 
+  /** @var StorageService */
+  private $storage;
+
   public function __construct(Container $container) {
     parent::__construct($container);
 
     $this->reviews = $container['reviews'];
+    $this->storage = $container['storage'];
   }
 
   protected function getOrder(Response $response, int $id, ?string $token = null): array {
@@ -74,6 +79,10 @@ class OrderController extends Controller {
         ]);
       }
 
+      $storageId = $this->storage->getNearest(
+        $target['coordinates']['lat'],
+        $target['coordinates']['lng']
+      );
       $id = $orders->insertGetId([
         'contact_name' => $info['name'],
         'phone' => $info['phone'],
@@ -87,6 +96,8 @@ class OrderController extends Controller {
         'notes' => $info['notes'],
 
         'token' => $token = str_random(64),
+
+        'storage_id' => $storageId,
       ]);
 
       $ordersCourses->insert($cartItems->map(function ($item) use ($cart, $id) {

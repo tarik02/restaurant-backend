@@ -178,3 +178,7 @@ $container['resource-driver'] = function (Container $container) {
 $container['resource-order'] = function (Container $container) {
   return new \App\Resources\OrderResourceProvider($container);
 };
+
+$container['storage'] = function (Container $container) {
+  return new \App\Services\StorageService($container);
+};
