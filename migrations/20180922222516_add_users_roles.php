@@ -7,7 +7,7 @@ use Illuminate\Database\Schema\Blueprint;
 class AddUsersRoles extends Migration {
   public function up() {
     Capsule::schema()->table('users', function(Blueprint $table) {
-      $table->json('roles')->default('["user"]');
+      $table->json('roles')->nullable();
     });
   }
 

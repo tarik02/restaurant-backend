@@ -47,7 +47,7 @@ class UsersService implements UserCredentialsInterface {
   public function toUser(?array $user): ?array {
     if ($user !== null) {
       $user['id'] = intval($user['id']);
-      $user['roles'] = json_decode($user['roles'], true);
+      $user['roles'] = json_decode($user['roles'] ?? '["user"]', true);
     }
 
     return $user;
