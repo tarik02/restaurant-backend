@@ -9,8 +9,8 @@ class CreateDrivers2 extends Migration {
     Capsule::schema()->create('drivers', function(Blueprint $table) {
       $table->integer('driver_id')->unsigned();
 
-      $table->float('latitude')->nullable();
-      $table->float('longitude')->nullable();
+      $table->double('latitude')->nullable();
+      $table->double('longitude')->nullable();
 
       $table->primary(['driver_id']);
     });

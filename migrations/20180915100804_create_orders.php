@@ -11,8 +11,8 @@ class CreateOrders extends Migration {
       $table->string('contact_name');
       $table->string('phone')->nullable();
       $table->string('address')->nullable();
-      $table->float('latitude');
-      $table->float('longtitude');
+      $table->double('latitude');
+      $table->double('longtitude');
       $table->string('notes');
     });
   }

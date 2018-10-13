@@ -11,8 +11,8 @@ class CreateDrivers extends Migration {
 
       $table->string('name');
 
-      $table->float('lat');
-      $table->float('lng');
+      $table->double('lat');
+      $table->double('lng');
     });
   }
 

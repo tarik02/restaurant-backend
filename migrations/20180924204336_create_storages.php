@@ -10,8 +10,8 @@ class CreateStorages extends Migration {
       $table->increments('id');
       $table->string('name');
 
-      $table->float('latitude')->nullable();
-      $table->float('longitude')->nullable();
+      $table->double('latitude')->nullable();
+      $table->double('longitude')->nullable();
     });
   }
 

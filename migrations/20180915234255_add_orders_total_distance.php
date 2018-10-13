@@ -7,7 +7,7 @@ use Illuminate\Database\Schema\Blueprint;
 class AddOrdersTotalDistance extends Migration {
   public function up() {
     Capsule::schema()->table('orders', function(Blueprint $table) {
-      $table->float('total_distance')->nullable();
+      $table->double('total_distance')->nullable();
     });
   }
 

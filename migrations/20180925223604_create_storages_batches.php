@@ -12,8 +12,8 @@ class CreateStoragesBatches extends Migration {
       $table->integer('storage_id');
       $table->integer('ingredient_id');
 
-      $table->float('count');
-      $table->float('remaining');
+      $table->double('count');
+      $table->double('remaining');
       $table->timestamp('best_by');
     });
   }

@@ -7,7 +7,7 @@ use Illuminate\Database\Schema\Blueprint;
 class AddCoursesIngredientsAmount extends Migration {
   public function up() {
     Capsule::schema()->table('courses_ingredients', function(Blueprint $table) {
-      $table->float('amount')->default(0);
+      $table->double('amount')->default(0);
     });
   }
 
