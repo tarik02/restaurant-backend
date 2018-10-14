@@ -14,7 +14,7 @@ class CreateStoragesBatches extends Migration {
 
       $table->double('count');
       $table->double('remaining');
-      $table->timestamp('best_by');
+      $table->timestamp('best_by')->useCurrent();
     });
   }
 
