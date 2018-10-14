@@ -129,9 +129,6 @@ class OperatorController extends Controller {
     $id = $body['id'] ?? null;
     $images = $body['images'];
 
-    $this->container->get('logger')->info('HERE');
-    $this->container->get('logger')->info($request->getParsedBodyParam('data'));
-
     $firstNull = 0;
     /** @var UploadedFile $file */
     foreach ($files as $file) {
