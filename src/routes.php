@@ -110,6 +110,11 @@ $app->group('/api/v1', function () use ($app) { //api
     $app->get('/batches/old', StorageController::class.':getOldBatches');
   });
 
+  $app->group('/cook', function () use ($app) { // cook
+    $app->get('/dashboard', CookController::class.':dashboard');
+
+  });
+
   $app->group('/driver', function () use ($app) { // driver
     $app->get('/dashboard', DriverController::class.':dashboard');
     $app->post('/report-location', DriverController::class.':reportLocation');

@@ -110,7 +110,8 @@ class OrderController extends Controller {
         return [
           'order_id' => $orderId,
           'course_id' => $item['id'],
-          'count' => $cart[$item['id']],
+          'count' => $count = $cart[$item['id']],
+          'remaining' => $count,
         ];
       })->toArray());
 
@@ -127,14 +128,6 @@ class OrderController extends Controller {
       $uniqueIngredients = $coursesIngredients->map(function (Collection $ingredients) {
         return $ingredients->keys();
       })->values()->collapse()->unique();
-//      $ingredients = $this->db->table('ingredients')
-//        ->whereIn('id', $uniqueIngredients)
-//        ->get()
-//        ->pluck()
-
-//      throw new ResponseException($response->withJson(
-//
-//      , 500));
       $ingredients = $uniqueIngredients->mapWithKeys(function ($id) {
         return [$id => 0];
       });
