@@ -207,7 +207,7 @@ class StorageController extends Controller {
       'ingredient_id' => $body['ingredient_id'],
       'count' => $body['count'],
       'remaining' => $body['remaining'],
-      'best_by' => $this->deserializer->dateTime($body['best_by'])->getTimestamp(),
+      'best_by' => $this->deserializer->dateTime($body['best_by'])->format('Y-m-d H:i:s'),
     ];
     if ($id === null) {
       $id = $table->insertGetId($data);

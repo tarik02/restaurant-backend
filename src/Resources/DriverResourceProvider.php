@@ -25,7 +25,7 @@ class DriverResourceProvider extends ResourceProvider {
     ];
   }
 
-  public function get(int $id): array {
+  public function get(int $id): ?array {
     return $this->db->table('drivers')->where('driver_id', $id)->first();
   }
 

@@ -13,7 +13,7 @@ class UserResourceProvider extends ResourceProvider {
     $this->db = $container['db']->connection();
   }
 
-  public function get(int $id): array {
+  public function get(int $id): ?array {
     return $this->db->table('users')->find($id);
   }
 

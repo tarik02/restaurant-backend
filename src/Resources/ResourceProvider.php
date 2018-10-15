@@ -7,7 +7,7 @@ abstract class ResourceProvider {
     return [];
   }
 
-  abstract function get(int $id): array;
+  abstract function get(int $id): ?array;
 
   abstract function fromDB(array $original): array;
 }

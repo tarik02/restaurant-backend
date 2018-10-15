@@ -36,9 +36,11 @@ class ReviewsService {
         'text' => $review['text'] ?? null,
         'rating' => $review['rating'] ?? null,
 
-        'created_at' => !empty($review['created_at'])
-          ? $this->deserializer->dateTime($review['created_at'])->getTimestamp()
-          : (new \DateTime())->getTimestamp(),
+        'created_at' => (
+          !empty($review['created_at'])
+          ? $this->deserializer->dateTime($review['created_at'])
+          : (new \DateTime())
+        )->format('Y-m-d H:i:s'),
       ]
     );
   }

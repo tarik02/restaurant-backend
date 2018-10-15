@@ -28,7 +28,7 @@ class NotificationsService {
           'type' => $type,
           'data' => $data,
         ]),
-        'created_at' => $createdAt->getTimestamp(),
+        'created_at' => $createdAt->format('Y-m-d H:i:s'),
       ]);
 
     return $id;

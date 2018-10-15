@@ -31,7 +31,7 @@ class Scheduler {
       ->insert(
         [
           'status' => 0,
-          'next_run' => $dateTime->getTimestamp(),
+          'next_run' => $dateTime->format('Y-m-d H:i:s'),
           'data' => serialize($task),
         ]
       );

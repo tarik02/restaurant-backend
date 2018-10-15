@@ -20,7 +20,7 @@ $scheduler->call(function () use ($serializer, $notifications) {
 
   $batches = DB::table('storages_batches')
     ->where('remaining', '>', '0')
-    ->where('best_by', '<', (new DateTime())->add(new DateInterval('P10D'))->getTimestamp())
+    ->where('best_by', '<', (new DateTime())->add(new DateInterval('P10D'))->format('Y-m-d H:i:s'))
     ->whereNotIn('id', function (Builder $query) {
       $query->select('id')->from('storages_batches_old');
     })

@@ -19,7 +19,7 @@ class OrderResourceProvider extends ResourceProvider {
     $this->serializer = $container['serializer'];
   }
 
-  public function get(int $id): array {
+  public function get(int $id): ?array {
     return $this->db->table('orders')->find($id);
   }
 
