@@ -179,6 +179,10 @@ $container['resource-order'] = function (Container $container) {
   return new \App\Resources\OrderResourceProvider($container);
 };
 
+$container['resource-cook'] = function (Container $container) {
+  return new \App\Resources\CookResourceProvider($container);
+};
+
 $container['storage'] = function (Container $container) {
   return new \App\Services\StorageService($container);
 };

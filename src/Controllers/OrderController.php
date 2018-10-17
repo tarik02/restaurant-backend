@@ -112,6 +112,7 @@ class OrderController extends Controller {
           'course_id' => $item['id'],
           'count' => $count = $cart[$item['id']],
           'remaining' => $count,
+          'done' => 0,
         ];
       })->toArray());
 

@@ -1,5 +1,6 @@
 <?php
 
+use App\Controllers\CookController;
 use App\Controllers\DefaultController;
 use App\Controllers\DriverController;
 use App\Controllers\NotificationController;
@@ -73,7 +74,6 @@ $app->group('/api/v1', function () use ($app) { //api
   });
 
   $app->group('/user', function () use ($app, $server) { // user
-
     $app->get('', UserController::class.':user');
     $app->get('/notifications', NotificationController::class.':getAndFlush');
 
@@ -108,10 +108,15 @@ $app->group('/api/v1', function () use ($app) { //api
     $app->delete('/{storage}/batches/{id}', StorageController::class.':deleteBatch');
 
     $app->get('/batches/old', StorageController::class.':getOldBatches');
+
   });
 
   $app->group('/cook', function () use ($app) { // cook
     $app->get('/dashboard', CookController::class.':dashboard');
+
+    $app->post('/start-cooking/{order_id}/{course_id}', CookController::class.':startCooking');
+    $app->post('/cancel-cooking/{id}', CookController::class.':cancelCooking');
+    $app->post('/done-cooking/{id}', CookController::class.':doneCooking');
 
   });
 
