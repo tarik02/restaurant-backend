@@ -9,7 +9,7 @@ class CreateCourses extends Migration {
     Capsule::schema()->create('courses', function(Blueprint $table) {
       $table->increments('id');
       $table->string('title');
-      $table->string('description');
+      $table->text('description');
       $table->string('image');
       $table->integer('price');
     });
