@@ -48,7 +48,7 @@ class UserController extends Controller {
   public function user(Request $request, Response $response, array $args) {
     $user = $this->users->getUserFromRequest($request);
 
-    return $response->withJson([
+    return $response->withJson(null === $user ? null : [
       'id' => $user['id'],
       'username' => $user['username'],
       'email' => $user['email'],
