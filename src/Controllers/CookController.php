@@ -50,6 +50,7 @@ class CookController extends Controller {
       ->where('orders.status', OrderStatus::WAITING)
       ->where('orders.storage_id', $cook['storage_id'])
       ->orderBy('orders.created_at')
+      ->orderBy('orders_courses.order_id')
       ->orderBy('orders_courses.course_id')
       ->get([
         'orders.id as order_id',
@@ -240,7 +241,20 @@ class CookController extends Controller {
         ->update([
           'done' => $done + 1,
         ]);
-      if ($done + 1 === $count) {
+
+      $ordersCourses = $this->db->table('orders_courses')
+        ->where('order_id', $orderId)
+        ->get(['count', 'done'])
+      ;
+
+      $doneOrder = true;
+      foreach ($ordersCourses as $course) {
+        if ($course['count'] !== $course['done']) {
+          $doneOrder = false;
+          break;
+        }
+      }
+      if ($doneOrder) {
         $this->db->table('orders')
           ->where('id', $orderId)
           ->update([
