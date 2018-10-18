@@ -7,6 +7,7 @@ use App\Controllers\NotificationController;
 use App\Controllers\OperatorController;
 use App\Controllers\OrderController;
 use App\Controllers\ReviewsController;
+use App\Controllers\StatsController;
 use App\Controllers\StorageController;
 use App\Controllers\UserController;
 use Chadicus\Slim\OAuth2\Routes;
@@ -117,6 +118,11 @@ $app->group('/api/v1', function () use ($app) { //api
     $app->post('/start-cooking/{order_id}/{course_id}', CookController::class.':startCooking');
     $app->post('/cancel-cooking/{id}', CookController::class.':cancelCooking');
     $app->post('/done-cooking/{id}', CookController::class.':doneCooking');
+
+  });
+
+  $app->group('/stats', function () use ($app) { // stats
+    $app->get('/courses', StatsController::class.':courses');
 
   });
 
