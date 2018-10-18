@@ -48,7 +48,7 @@ class CookController extends Controller {
       ->where('remaining', '<>', 0)
       ->leftJoin('orders', 'orders_courses.order_id', '=', 'orders.id')
       ->where('orders.status', OrderStatus::WAITING)
-      ->where('orders.storage_id', null)
+      ->where('orders.storage_id', $cook['storage_id'])
       ->orderBy('orders.created_at')
       ->get([
         'orders.id as order_id',
