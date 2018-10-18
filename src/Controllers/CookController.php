@@ -50,6 +50,7 @@ class CookController extends Controller {
       ->where('orders.status', OrderStatus::WAITING)
       ->where('orders.storage_id', $cook['storage_id'])
       ->orderBy('orders.created_at')
+      ->orderBy('orders_courses.course_id')
       ->get([
         'orders.id as order_id',
         'orders_courses.course_id',
