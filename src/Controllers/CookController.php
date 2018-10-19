@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Services\ResourcesService;
+use App\Util\Clock;
 use App\Util\Deserializer;
 use App\Util\OrderStatus;
 use App\Util\Serializer;
@@ -123,7 +124,7 @@ class CookController extends Controller {
             'cook_id' => $cook['id'],
             'order_id' => $orderId,
             'course_id' => $courseId,
-            'created_at' => (new \DateTime())->format('Y-m-d H:i:s'),
+            'created_at' => Clock::current()->format('Y-m-d H:i:s'),
           ];
         }, range(1, $count))
       );

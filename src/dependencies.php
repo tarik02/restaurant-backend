@@ -24,6 +24,24 @@ $container['logger'] = function (Container $container) {
   return $logger;
 };
 
+(function (array $config) {
+  if ($config['enable'] !== true) {
+    return;
+  }
+
+  $rel = $config['rel'] ?? [];
+  $relDays = $rel['days'] ?? 0;
+
+  $fake = new DateTime();
+  if ($relDays < 0) {
+    $relDays = -$relDays;
+    $fake = $fake->sub(new DateInterval("P{$relDays}D"));
+  } else {
+    $fake = $fake->add(new DateInterval("P{$relDays}D"));
+  }
+  \App\Util\Clock::fake($fake);
+})($container->get('settings')['fake-date']);
+
 // Service factory for the ORM
 $container['db'] = function (Container $container) {
   $capsule = new Manager();

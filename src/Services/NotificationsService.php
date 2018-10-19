@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Util\Clock;
 use App\Util\Deserializer;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Support\Collection;
@@ -18,7 +19,7 @@ class NotificationsService {
     ?\DateTimeInterface $createdAt = null
   ) {
     if ($createdAt === null) {
-      $createdAt = new \DateTime();
+      $createdAt = Clock::current();
     }
 
     $id = DB::table('notifications')

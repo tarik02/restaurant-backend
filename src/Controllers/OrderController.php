@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Services\ReviewsService;
 use App\Services\StorageService;
+use App\Util\Clock;
 use App\Util\OrderStatus;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Connection;
@@ -93,7 +94,7 @@ class OrderController extends Controller {
         'contact_name' => $info['name'],
         'phone' => $info['phone'],
 
-        'created_at' => new \DateTime(),
+        'created_at' => Clock::current(),
         'price' => $price,
 
         'address' => $target['address'],

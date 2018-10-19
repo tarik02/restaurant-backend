@@ -26,4 +26,6 @@ return [
   'db' => require 'db.php',
   'cors' => require 'cors.php',
   'oauth2' => require 'oauth2.php',
+
+  'fake-date' => require 'fake-date.php',
 ];

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Util\Clock;
 use App\Util\Deserializer;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Connection;
@@ -39,7 +40,7 @@ class ReviewsService {
         'created_at' => (
           !empty($review['created_at'])
           ? $this->deserializer->dateTime($review['created_at'])
-          : (new \DateTime())
+          : Clock::current()
         )->format('Y-m-d H:i:s'),
       ]
     );
