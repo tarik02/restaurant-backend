@@ -31,13 +31,17 @@ class StatsController extends Controller {
   public function courses(Request $request, Response $response, array $args) {
     $this->assertAbility($request, $response, 'stats');
 
-    $since = (new \DateTime())->sub(new \DateInterval('P5D'));
-    $until = new \DateTime();
+    $dayOfWeek = $request->getParam('dayOfWeek') === 'true';
+    $since = $this->deserializer->dateTime($this->assert($response, $request->getParam('since')));
+    $until = $this->deserializer->dateTime($this->assert($response, $request->getParam('until')));
 
     $stats = collect($this->db->select(<<<SQL
     SELECT
       orders_courses.course_id,
-      DATE(orders.created_at) as day,
+SQL
+      . ($dayOfWeek ? 'DAYOFWEEK' : 'DATE') .
+<<<SQL
+      (orders.created_at) as day,
       SUM(orders_courses.count) as count
     FROM orders_courses
     LEFT JOIN orders ON orders.id = orders_courses.order_id
@@ -46,8 +50,8 @@ class StatsController extends Controller {
     GROUP BY day, orders_courses.course_id
 SQL
     , [
-      'since' => $since,
-      'until' => $until,
+      'since' => $since->format('Y-m-d'),
+      'until' => $until->format('Y-m-d'),
     ]))
       ->mapToGroups(function (array $data) {
         return [$data['course_id'] => $data];
