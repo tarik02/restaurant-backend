@@ -65,4 +65,35 @@ SQL
 
     return $response->withJson($stats);
   }
+
+  public function income(Request $request, Response $response, array $args) {
+//    $this->assertAbility($request, $response, 'stats');
+
+    $dayOfWeek = $request->getParam('dayOfWeek') === 'true';
+    $since = $this->deserializer->dateTime($this->assert($response, $request->getParam('since')));
+    $until = $this->deserializer->dateTime($this->assert($response, $request->getParam('until')));
+
+    $stats = collect($this->db->select(<<<SQL
+    SELECT
+SQL
+      . ($dayOfWeek ? ' DAYOFWEEK' : ' DATE') .
+      <<<SQL
+      (orders.created_at) as day,
+      SUM(orders.price) as price
+    FROM orders
+    WHERE
+      orders.created_at BETWEEN :since AND :until
+    GROUP BY day
+SQL
+      , [
+        'since' => $since->format('Y-m-d'),
+        'until' => $until->format('Y-m-d'),
+      ]))
+      ->mapWithKeys(function (array $data) {
+        return [$data['day'] => intval($data['price'])];
+      })
+    ;
+
+    return $response->withJson($stats);
+  }
 }
