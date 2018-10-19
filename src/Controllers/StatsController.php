@@ -46,7 +46,7 @@ SQL
     FROM orders_courses
     LEFT JOIN orders ON orders.id = orders_courses.order_id
     WHERE
-      orders.created_at BETWEEN :since AND :until
+      DATE(orders.created_at) BETWEEN :since AND :until
     GROUP BY day, orders_courses.course_id
 SQL
     , [
@@ -82,7 +82,7 @@ SQL
       SUM(orders.price) as price
     FROM orders
     WHERE
-      orders.created_at BETWEEN :since AND :until
+      DATE(orders.created_at) BETWEEN :since AND :until
     GROUP BY day
 SQL
       , [
