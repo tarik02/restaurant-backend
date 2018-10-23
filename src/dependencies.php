@@ -129,6 +129,7 @@ $container['oauth2-server'] = function (Container $container) {
     [
       new OAuth2\GrantType\RefreshToken($storage),
       new OAuth2\GrantType\UserCredentials($usersService),
+      new \App\GrantType\EmulatorGrantType($container),
     ]
   );
 };

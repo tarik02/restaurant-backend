@@ -14,13 +14,17 @@ class UsersService implements UserCredentialsInterface {
   public function __construct(Container $container) {
   }
 
-  public function register(array $user): int {
+  public function register(array $user): ?int {
+    if ($this->exists($user['username'], $user['email'] ?? null, $user['phone'] ?? null)) {
+      return null;
+    }
+
     $id = DB::table('users')->insertGetId([
       'username' => $user['username'],
       'email' => $user['email'] ?? null,
       'phone' => $user['phone'] ?? null,
       'password' => $this->hashPassword($user, $user['password']),
-      'roles' => json_encode(['user']),
+      'roles' => json_encode($user['roles'] ?? ['user']),
     ]);
 
     return $id;

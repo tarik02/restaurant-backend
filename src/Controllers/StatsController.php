@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Services\ResourcesService;
 use App\Util\Deserializer;
+use App\Util\OrderStatus;
 use Illuminate\Database\Connection;
 use Illuminate\Support\Collection;
 use Slim\Container;
@@ -46,10 +47,12 @@ SQL
     FROM orders_courses
     LEFT JOIN orders ON orders.id = orders_courses.order_id
     WHERE
+      orders.status = :orderStatus AND
       DATE(orders.created_at) BETWEEN :since AND :until
     GROUP BY day, orders_courses.course_id
 SQL
     , [
+      'orderStatus' => OrderStatus::DONE,
       'since' => $since->format('Y-m-d'),
       'until' => $until->format('Y-m-d'),
     ]))
@@ -67,7 +70,7 @@ SQL
   }
 
   public function income(Request $request, Response $response, array $args) {
-//    $this->assertAbility($request, $response, 'stats');
+    $this->assertAbility($request, $response, 'stats');
 
     $dayOfWeek = $request->getParam('dayOfWeek') === 'true';
     $since = $this->deserializer->dateTime($this->assert($response, $request->getParam('since')));
@@ -82,10 +85,12 @@ SQL
       SUM(orders.price) as price
     FROM orders
     WHERE
+      orders.status = :orderStatus AND
       DATE(orders.created_at) BETWEEN :since AND :until
     GROUP BY day
 SQL
       , [
+        'orderStatus' => OrderStatus::DONE,
         'since' => $since->format('Y-m-d'),
         'until' => $until->format('Y-m-d'),
       ]))

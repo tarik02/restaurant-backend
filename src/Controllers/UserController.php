@@ -36,7 +36,6 @@ class UserController extends Controller {
       'email' => $body['email'] ?? null,
       'phone' => $body['phone'] ?? null,
       'password' => $body['password'],
-      'roles' => ['user'],
     ]);
 
     return $response->withJson([
