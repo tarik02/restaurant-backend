@@ -36,13 +36,13 @@ class StatsController extends Controller {
     $since = $this->deserializer->dateTime($this->assert($response, $request->getParam('since')));
     $until = $this->deserializer->dateTime($this->assert($response, $request->getParam('until')));
 
-    $stats = collect($this->db->select(<<<SQL
+    $stats = collect($this->db->select(str_replace(
+      'DATEFUNCTION',
+      $dayOfWeek ? 'DAYOFWEEK' : 'DATE',
+<<<SQL
     SELECT
       orders_courses.course_id,
-SQL
-      . ($dayOfWeek ? 'DAYOFWEEK' : 'DATE') .
-<<<SQL
-      (orders.created_at) as day,
+      DATEFUNCTION(orders.created_at) as day,
       SUM(orders_courses.count) as count
     FROM orders_courses
     LEFT JOIN orders ON orders.id = orders_courses.order_id
@@ -51,7 +51,7 @@ SQL
       DATE(orders.created_at) BETWEEN :since AND :until
     GROUP BY day, orders_courses.course_id
 SQL
-    , [
+    ), [
       'orderStatus' => OrderStatus::DONE,
       'since' => $since->format('Y-m-d'),
       'until' => $until->format('Y-m-d'),
@@ -76,12 +76,12 @@ SQL
     $since = $this->deserializer->dateTime($this->assert($response, $request->getParam('since')));
     $until = $this->deserializer->dateTime($this->assert($response, $request->getParam('until')));
 
-    $stats = collect($this->db->select(<<<SQL
+    $stats = collect($this->db->select(str_replace(
+      'DATEFUNCTION',
+      $dayOfWeek ? 'DAYOFWEEK' : 'DATE',
+<<<SQL
     SELECT
-SQL
-      . ($dayOfWeek ? ' DAYOFWEEK' : ' DATE') .
-      <<<SQL
-      (orders.created_at) as day,
+      DATEFUNCTION(orders.created_at) as day,
       SUM(orders.price) as price
     FROM orders
     WHERE
@@ -89,13 +89,59 @@ SQL
       DATE(orders.created_at) BETWEEN :since AND :until
     GROUP BY day
 SQL
-      , [
+      ), [
         'orderStatus' => OrderStatus::DONE,
         'since' => $since->format('Y-m-d'),
         'until' => $until->format('Y-m-d'),
       ]))
       ->mapWithKeys(function (array $data) {
         return [$data['day'] => intval($data['price'])];
+      })
+    ;
+
+    return $response->withJson($stats);
+  }
+
+  public function ingredients(Request $request, Response $response, array $args) {
+    $this->assertAbility($request, $response, 'stats');
+
+    $dayOfWeek = $request->getParam('dayOfWeek') === 'true';
+    $since = $this->deserializer->dateTime($this->assert($response, $request->getParam('since')));
+    $until = $this->deserializer->dateTime($this->assert($response, $request->getParam('until')));
+
+    $stats = collect($this->db->select(str_replace(
+      'DATEFUNCTION',
+      $dayOfWeek ? 'DAYOFWEEK' : 'DATE',
+<<<SQL
+    SELECT
+      DATEFUNCTION(orders.created_at) as day,
+      ingredients.title as ingredient,
+      ingredients.unit as unit,
+      ROUND(SUM(courses_ingredients.amount * orders_courses.count), 1) as count
+    FROM orders
+    LEFT JOIN orders_courses ON orders_courses.order_id = orders.id
+    LEFT JOIN courses_ingredients ON courses_ingredients.course_id = orders_courses.course_id
+    LEFT JOIN ingredients ON ingredients.id = courses_ingredients.ingredient_id
+    WHERE
+      orders.status = :orderStatus AND
+      DATE(orders.created_at) BETWEEN :since AND :until
+    GROUP BY day, courses_ingredients.ingredient_id
+SQL
+      ), [
+        'orderStatus' => OrderStatus::DONE,
+        'since' => $since->format('Y-m-d'),
+        'until' => $until->format('Y-m-d'),
+      ]))
+      ->mapToGroups(function (array $data) {
+        return [$data['ingredient'] => $data];
+      })
+      ->map(function ($data) {
+        return collect($data)->mapWithKeys(function (array $data) {
+          return [$data['day'] => [
+            'count' => floatval($data['count']),
+            'unit' => $data['unit'],
+          ]];
+        });
       })
     ;
 
