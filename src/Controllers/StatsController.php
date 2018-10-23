@@ -147,4 +147,44 @@ SQL
 
     return $response->withJson($stats);
   }
+
+  public function ingredientsOutdated(Request $request, Response $response, array $args) {
+    $this->assertAbility($request, $response, 'stats');
+
+    $since = $this->deserializer->dateTime($this->assert($response, $request->getParam('since')));
+    $until = $this->deserializer->dateTime($this->assert($response, $request->getParam('until')));
+
+    $stats = collect($this->db->select(
+<<<SQL
+    SELECT
+      DATE(storages_batches.best_by) as day,
+      ingredients.title as ingredient,
+      ingredients.unit as unit,
+      ROUND(SUM(storages_batches.remaining), 1) as count
+    FROM storages_batches_old
+    LEFT JOIN storages_batches ON storages_batches.id = storages_batches_old.id
+    LEFT JOIN ingredients ON ingredients.id = storages_batches.ingredient_id
+    WHERE
+      DATE(storages_batches.best_by) BETWEEN :since AND :until
+    GROUP BY day, ingredients.id
+SQL
+    , [
+      'since' => $since->format('Y-m-d'),
+      'until' => $until->format('Y-m-d'),
+    ]))
+      ->mapToGroups(function (array $data) {
+        return [$data['ingredient'] => $data];
+      })
+      ->map(function ($data) {
+        return collect($data)->mapWithKeys(function (array $data) {
+          return [$data['day'] => [
+            'count' => floatval($data['count']),
+            'unit' => $data['unit'],
+          ]];
+        });
+      })
+    ;
+
+    return $response->withJson($stats);
+  }
 }
