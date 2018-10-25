@@ -322,6 +322,8 @@ class OperatorController extends Controller {
   public function users(Request $request, Response $response, array $args) {
     $this->assertAbility($request, $response, 'operator');
 
+    $storages = $this->db->table('storages')->get();
+
     $query = $this->db->table('users');
     $roles = $request->getParam('roles', []);
     foreach ($roles as $role) {
@@ -339,6 +341,13 @@ class OperatorController extends Controller {
     $reviews = $query->get();
 
     return $response->withJson([
+      'storages' => $storages->map(function (array $storage) {
+        return [
+          'id' => intval($storage['id']),
+          'name' => $storage['name'],
+        ];
+      }),
+
       'roles' => [
 //        'user' => 'Користувач',
         'driver' => 'Водій',
@@ -350,14 +359,30 @@ class OperatorController extends Controller {
       ],
 
       'data' => $reviews->map(function (array $user) {
+        $id = intval($user['id']);
+        $roles = json_decode($user['roles'], false);
+
+        $additonal = [];
+        if (in_array('cook', $roles)) {
+          $cook = $this->db->table('cooks')->where('user_id', $id)->first();
+
+          if ($cook === null) {
+            $additonal['storage_id'] = null;
+          } else {
+            $additonal['storage_id'] = intval($cook['storage_id']);
+          }
+        }
+
         return [
-          'id' => intval($user['id']),
+          'id' => $id,
 
           'username' => $user['username'],
           'email' => $user['email'],
           'phone' => $user['phone'],
 
-          'roles' => json_decode($user['roles'], false),
+          'roles' => $roles,
+
+          'additonal' => $additonal,
         ];
       }),
 
@@ -378,11 +403,20 @@ class OperatorController extends Controller {
       $this->db->table('users')
       ->where('id', $id)
       ->update([
-        'roles' => $roles,
+        'roles' => json_encode($roles),
       ]) !== 1
     ) {
       return $response->withJson([
         'status' => 'not-exists',
+      ]);
+    }
+
+    if (in_array('cook', $roles)) {
+      $storageId = $request->getParsedBodyParam('storage_id');
+      $this->db->table('cooks')->updateOrInsert([
+        'user_id' => $id,
+      ], [
+        'storage_id' => $storageId,
       ]);
     }
 
