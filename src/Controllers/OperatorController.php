@@ -2,9 +2,11 @@
 namespace App\Controllers;
 
 use App\Services\Uploads;
+use App\Util\Paginator;
 use App\Util\Serializer;
 use App\Util\OrderStatus;
 use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Collection;
 use Slim\Container;
 use Slim\Http\Request;
@@ -14,6 +16,9 @@ use Slim\Http\UploadedFile;
 class OperatorController extends Controller {
   /** @var Container */
   protected $container;
+
+  /** @var Connection */
+  protected $db;
 
   /** @var Uploads */
   protected $uploads;
@@ -25,6 +30,7 @@ class OperatorController extends Controller {
     parent::__construct($container);
 
     $this->container = $container;
+    $this->db = $container['db']->connection();
     $this->uploads = $this->container['uploads'];
     $this->serializer = $container['serializer'];
   }
@@ -306,6 +312,79 @@ class OperatorController extends Controller {
     }
 
     $coursesIngredients->where('ingredient_id', $id)->delete();
+
+    return $response->withJson([
+      'status' => 'ok',
+    ]);
+  }
+
+
+  public function users(Request $request, Response $response, array $args) {
+    $this->assertAbility($request, $response, 'operator');
+
+    $query = $this->db->table('users');
+    $roles = $request->getParam('roles', []);
+    foreach ($roles as $role) {
+      $query->orWhereJsonContains('roles', $role);
+    }
+
+    $pagination = (new Paginator())
+      ->minPerPage(5)
+      ->maxPerPage(100)
+      ->page(intval($request->getParam('page', 1)))
+      ->perPage(intval($request->getParam('perPage', 15)))
+      ->apply($response, $query);
+
+    $total = $query->getCountForPagination();
+    $reviews = $query->get();
+
+    return $response->withJson([
+      'roles' => [
+//        'user' => 'Користувач',
+        'driver' => 'Водій',
+        'storage' => 'Кафе',
+        'operator' => 'Оператор',
+        'reviews' => 'Відгуки',
+        'cook' => 'Кухар',
+        'stats' => 'Статистика',
+      ],
+
+      'data' => $reviews->map(function (array $user) {
+        return [
+          'id' => intval($user['id']),
+
+          'username' => $user['username'],
+          'email' => $user['email'],
+          'phone' => $user['phone'],
+
+          'roles' => json_decode($user['roles'], false),
+        ];
+      }),
+
+      'meta' => [
+        'totalCount' => $total,
+        'pagination' => $pagination,
+      ],
+    ]);
+  }
+
+  public function userRoles(Request $request, Response $response, array $args) {
+    $this->assertAbility($request, $response, 'operator');
+
+    $id = $this->assert($response, $args['id'] ?? null);
+    $roles = $request->getParsedBodyParam('roles');
+
+    if (
+      $this->db->table('users')
+      ->where('id', $id)
+      ->update([
+        'roles' => $roles,
+      ]) !== 1
+    ) {
+      return $response->withJson([
+        'status' => 'not-exists',
+      ]);
+    }
 
     return $response->withJson([
       'status' => 'ok',

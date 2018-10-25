@@ -151,6 +151,9 @@ $app->group('/api/v1', function () use ($app) { //api
     $app->put('/ingredients', OperatorController::class.':ingredientSave');
     $app->delete('/ingredients', OperatorController::class.':ingredientDelete');
 
+    $app->get('/users', OperatorController::class.':users');
+    $app->post('/users/{id}/roles', OperatorController::class.':userRoles');
+
   });
 
 });
