@@ -52,6 +52,7 @@ class DriverController extends Controller {
         $orders = $this->db->table('orders')
           ->where('status', OrderStatus::WAITING_FOR_DRIVER)
           ->orderBy('created_at', 'asc')
+          ->take(25)
           ->get()
         ;
 

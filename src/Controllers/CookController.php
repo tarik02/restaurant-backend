@@ -53,6 +53,7 @@ class CookController extends Controller {
       ->orderBy('orders.created_at')
       ->orderBy('orders_courses.order_id')
       ->orderBy('orders_courses.course_id')
+      ->take(25)
       ->get([
         'orders.id as order_id',
         'orders_courses.course_id',
