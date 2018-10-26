@@ -13,6 +13,7 @@ use SuperClosure\Serializer;
 
 // DIC configuration
 
+/** @var Container $container */
 $container = $app->getContainer();
 
 // monolog
@@ -40,10 +41,10 @@ $container['logger'] = function (Container $container) {
     $fake = $fake->add(new DateInterval("P{$relDays}D"));
   }
   \App\Util\Clock::fake($fake);
-})($container->get('settings')['fake-date']);
+})($container['settings']['fake-date']);
 
 // Service factory for the ORM
-$container['db'] = function (Container $container) {
+$container['db'] = $container->factory(function (Container $container) {
   $capsule = new Manager();
 
   $config = $container['settings']['db'];
@@ -72,7 +73,7 @@ $container['db'] = function (Container $container) {
   $capsule->bootEloquent();
 
   return $capsule;
-};
+});
 
 $container['users'] = function (Container $container) {
   $container->get('db');

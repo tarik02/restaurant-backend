@@ -28,4 +28,6 @@ return [
   'oauth2' => require 'oauth2.php',
 
   'fake-date' => require 'fake-date.php',
+
+  'installed' => env('INSTALLED', false),
 ];

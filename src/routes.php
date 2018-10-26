@@ -3,6 +3,7 @@
 use App\Controllers\CookController;
 use App\Controllers\DefaultController;
 use App\Controllers\DriverController;
+use App\Controllers\InstallController;
 use App\Controllers\NotificationController;
 use App\Controllers\OperatorController;
 use App\Controllers\OrderController;
@@ -59,13 +60,22 @@ $app->get('/', function (Request $request, Response $response, array $args) {
   return $response;
 });
 
-$app->group('/api/v1', function () use ($app) { //api
-
+$app->group('/api/v1', function () use ($app) { // api
   $container = $app->getContainer();
-  $server = $container->get('oauth2-server');
 
-  $app->group('/auth', function () use ($app, $container, $server) {
-    $views = $container->get('oauth2-views');
+  $settings = $container['settings'];
+  if (!$settings['installed']) {
+    $app->post('/install', InstallController::class.':install');
+    $app->any('[/{a:.+}]', function (Request $request, Response $response) {
+      return $response->withStatus(307, 'not-installed');
+    });
+
+    return;
+  }
+
+  $app->group('/auth', function () use ($app, $container) {
+    $server = $container['oauth2-server'];
+    $views = $container['oauth2-views'];
 
     $app->map(['GET', 'POST'], Routes\Authorize::ROUTE, new Routes\Authorize($server, $views))->setName('oauth2.authorize');
     $app->post(Routes\Token::ROUTE, new Routes\Token($server))->setName('oauth2.token');
@@ -74,7 +84,7 @@ $app->group('/api/v1', function () use ($app) { //api
 
   });
 
-  $app->group('/user', function () use ($app, $server) { // user
+  $app->group('/user', function () use ($app) { // user
     $app->get('', UserController::class.':user');
     $app->get('/notifications', NotificationController::class.':getAndFlush');
 

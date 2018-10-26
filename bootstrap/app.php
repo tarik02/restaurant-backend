@@ -3,9 +3,9 @@
 require_once 'kernel.php';
 
 // Instantiate the app
-$app = new \Slim\App([
-  'settings' => require config_path() . '/app.php',
-]);
+$app = new \App\App(
+  require config_path() . '/app.php'
+);
 
 // Set up dependencies
 require app_path() . '/dependencies.php';
