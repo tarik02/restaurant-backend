@@ -399,17 +399,19 @@ class OperatorController extends Controller {
     $id = $this->assert($response, $args['id'] ?? null);
     $roles = $request->getParsedBodyParam('roles');
 
-    if (
-      $this->db->table('users')
-      ->where('id', $id)
-      ->update([
-        'roles' => json_encode($roles),
-      ]) !== 1
-    ) {
+    $user = $this->db->table('users')->find($id);
+
+    if ($user === null) {
       return $response->withJson([
         'status' => 'not-exists',
       ]);
     }
+
+    $this->db->table('users')
+      ->where('id', $id)
+      ->update([
+        'roles' => json_encode($roles),
+      ]);
 
     if (in_array('cook', $roles)) {
       $storageId = $request->getParsedBodyParam('storage_id');
