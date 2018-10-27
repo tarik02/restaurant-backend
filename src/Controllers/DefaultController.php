@@ -4,10 +4,29 @@ namespace App\Controllers;
 
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Support\Collection;
+use Slim\Container;
 use Slim\Http\Request;
 use Slim\Http\Response;
 
 class DefaultController extends Controller {
+  /** @var string */
+  private $appName;
+
+  public function __construct(Container $container) {
+    parent::__construct($container);
+
+    $settings = $container['settings'];
+    $appSettings = $settings['app'];
+
+    $this->appName = $appSettings['name'];
+  }
+
+  public function info(Request $request, Response $response, array $args) {
+    return $response->withJson([
+      'name' => $this->appName,
+    ]);
+  }
+
   public function courses(Request $request, Response $response, array $args) {
     $result = DB::table('courses')
       ->where('visible', 1)

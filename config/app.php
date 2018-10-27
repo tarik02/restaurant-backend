@@ -1,7 +1,11 @@
 <?php
 
 return [
-  'displayErrorDetails' => true, // set to false in production
+  'app' => [
+    'name' => env('APP_NAME', 'Restaurant'),
+  ],
+
+  'displayErrorDetails' => env('APP_ENV') === 'dev', // set to false in production
   'addContentLengthHeader' => false, // Allow the web server to send the content-length header
   'determineRouteBeforeAppMiddleware' => false,
   'displayErrorDetails' => true,

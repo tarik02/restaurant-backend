@@ -91,6 +91,7 @@ $app->group('/api/v1', function () use ($app) { // api
   });
 
   $app->group('', function () use ($app) { // default
+    $app->get('/info', DefaultController::class.':info');
     $app->get('/courses', DefaultController::class.':courses');
 
   });
