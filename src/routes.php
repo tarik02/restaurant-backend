@@ -67,7 +67,7 @@ $app->group('/api/v1', function () use ($app) { // api
   if (!$settings['installed']) {
     $app->post('/install', InstallController::class.':install');
     $app->any('[/{a:.+}]', function (Request $request, Response $response) {
-      return $response->withStatus(307, 'not-installed');
+      return $response->withStatus(401, 'not-installed');
     });
 
     return;

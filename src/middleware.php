@@ -43,3 +43,12 @@ if ($container['settings']['installed']) {
 
   $app->add(new UserMiddleware($container));
 }
+
+$app->add(function (Request $request, Response $response, callable $next) use ($container) {
+  /** @var Response $response */
+  $response = $next($request, $response);
+
+  $response = $response->withHeader('Access-Control-Allow-Origin', '*');
+
+  return $response;
+});
