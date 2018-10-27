@@ -188,6 +188,15 @@ SQL
         }
       }
 
+      $this->db->unprepared(
+        <<<SQL
+DELETE FROM
+  `storages_batches`
+WHERE
+  `remaining` = 0
+SQL
+      );
+
       return $response->withJson([
         'status' => 'ok',
         'order_id' => $orderId,
