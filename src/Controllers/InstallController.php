@@ -148,7 +148,10 @@ class InstallController extends Controller {
         $pdo = $conn->getPdo();
 
         $sql = file_get_contents(resources_path() . '/default.sql');
-        $pdo->exec($sql);
+        $sql = trim($sql);
+        if ($sql !== '') {
+          $pdo->exec($sql);
+        }
       }
 
       @unlink($fileEnvTmp);
