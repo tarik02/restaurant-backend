@@ -144,9 +144,21 @@ class InstallController extends Controller {
         ]);
       }
 
-      if ($db['autofill']) {
-        $pdo = $conn->getPdo();
+      $pdo = $conn->getPdo();
+      $pdo->exec(<<<SQL
+REPLACE INTO
+  oauth_clients (client_id, client_secret, grant_types)
+VALUES
+  ('default', '2dc4cf2028d0ef0f209e9d807046de9203ab7366eb4a0f4ca4a1793ae9b75592', 'password');
 
+REPLACE INTO
+  oauth_clients (client_id, client_secret, grant_types)
+VALUES
+  ('emulator', '2dc4cf2028d0ef0f209e9d807046de9203ab7366eb4a0f4ca4a1793ae9b75595', 'emulator');
+SQL
+      );
+
+      if ($db['autofill']) {
         $sql = file_get_contents(resources_path() . '/default.sql');
         $sql = trim($sql);
         if ($sql !== '') {
