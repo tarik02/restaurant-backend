@@ -206,3 +206,7 @@ $container['resource-cook'] = function (Container $container) {
 $container['storage'] = function (Container $container) {
   return new \App\Services\StorageService($container);
 };
+
+$container['maps'] = function (Container $container) {
+  return new \App\Services\MapsService($container);
+};

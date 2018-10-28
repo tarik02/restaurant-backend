@@ -5,6 +5,8 @@ return [
     'name' => env('APP_NAME', 'Restaurant'),
   ],
 
+  'googleMapsToken' => 'AIzaSyC7pSqaRYy0oTPNo1s7ujY9dCn-vunRHD8',
+
   'displayErrorDetails' => env('APP_ENV') === 'dev', // set to false in production
   'addContentLengthHeader' => false, // Allow the web server to send the content-length header
   'determineRouteBeforeAppMiddleware' => false,

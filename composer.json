@@ -26,7 +26,8 @@
         "chadicus/slim-oauth2": "^3.1",
         "peppeocchi/php-cron-scheduler": "^2.3",
         "jeremeamia/SuperClosure": "^2.4",
-        "ext-json": "*"
+        "ext-json": "*",
+        "guzzlehttp/guzzle": "~6.0"
     },
     "require-dev": {
         "phpunit/phpunit": ">=4.8 < 6.0"

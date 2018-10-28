@@ -28,6 +28,12 @@ class SchedulerWorker {
   /** @var int */
   private $nextSchedulerRun = 0;
 
+  /** @var int */
+  private $nextTickerRun = 0;
+
+  /** @var array */
+  private $tickers = [];
+
   public function __construct(Container $container) {
     $this->container = $container;
     $this->logger = $container['logger'];
@@ -36,13 +42,17 @@ class SchedulerWorker {
 
     $this->logger->pushHandler(new StreamHandler('php://stdout', Logger::INFO));
 
-    (function (Container $container, Scheduler $scheduler) {
+    (function (Container $container, SchedulerWorker $service, Scheduler $scheduler) {
       include __DIR__ . '/../scheduler.php';
-    })($container, $this->scheduler);
+    })($container, $this, $this->scheduler);
+  }
+
+  public function addTicker(callable $ticker) {
+    $this->tickers []= $ticker;
   }
 
   public function update() {
-    if (($ts = (new \DateTime())->getTimestamp()) > $this->nextSchedulerRun) {
+    if (($ts = (new \DateTime())->getTimestamp()) >= $this->nextSchedulerRun) {
       $this->nextSchedulerRun = $ts + 60;
       $this->scheduler->run();
 
@@ -67,6 +77,19 @@ class SchedulerWorker {
       }
 
       $this->scheduler->resetRun();
+    }
+
+
+    if (($ts = (new \DateTime())->getTimestamp()) >= $this->nextTickerRun) {
+      $this->nextTickerRun = $ts + 1;
+
+      foreach ($this->tickers as $ticker) {
+        try {
+          $ticker();
+        } catch (\Throwable $e) {
+          $this->logger->error($e);
+        }
+      }
     }
 
     while (true) {

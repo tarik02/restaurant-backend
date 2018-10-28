@@ -17,7 +17,7 @@ class NotificationsService {
     string $type,
     array $data,
     ?\DateTimeInterface $createdAt = null
-  ) {
+  ): int {
     if ($createdAt === null) {
       $createdAt = Clock::current();
     }
@@ -33,6 +33,35 @@ class NotificationsService {
       ]);
 
     return $id;
+  }
+
+  public function broadcast(
+    array $userIds,
+    string $type,
+    array $data,
+    ?\DateTimeInterface $createdAt = null
+  ): array {
+    if ($createdAt === null) {
+      $createdAt = Clock::current();
+    }
+
+    $table = DB::table('notifications');
+    $dataString = json_encode([
+      'type' => $type,
+      'data' => $data,
+    ]);
+    $createdAtString = $createdAt->format('Y-m-d H:i:s');
+
+    $results = [];
+    foreach ($userIds as $id) {
+      $results[$id] = $table->insertGetId([
+        'user_id' => $id,
+        'data' => $dataString,
+        'created_at' => $createdAtString,
+      ]);
+    }
+
+    return $results;
   }
 
   public function get(int $userId): Collection {

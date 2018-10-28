@@ -32,7 +32,7 @@ class DriverController extends Controller {
       $this->db->table('drivers')
         ->insert([
           'driver_id' => $id,
-          'status' => DriverStatus::READY,
+          'status' => DriverStatus::OFF,
         ]);
     }
 
@@ -195,7 +195,7 @@ class DriverController extends Controller {
     $this->db->table('drivers')
       ->where('driver_id', $driver['id'])
       ->update([
-        'status' => DriverStatus::READY,
+        'status' => DriverStatus::IDLE,
         'order_id' => null,
       ]);
 
@@ -225,7 +225,7 @@ class DriverController extends Controller {
     $this->db->table('drivers')
       ->where('driver_id', $driver['id'])
       ->update([
-        'status' => DriverStatus::READY,
+        'status' => DriverStatus::IDLE,
         'order_id' => null,
       ]);
 
