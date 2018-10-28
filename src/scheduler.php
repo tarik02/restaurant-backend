@@ -1,6 +1,7 @@
 <?php
 
 use App\Services\MapsService;
+use App\Util\Clock;
 use App\Util\Deserializer;
 use App\Util\DriverStatus;
 use App\Util\OrderStatus;
@@ -79,7 +80,26 @@ $scheduler->call(function () use ($db, $serializer, $notifications) {
 /*------------------------------------------------------------------------*/
 
 /*------------------------------------------------------------------------*/
-/* Drivers */
+/* Drivers idle check */
+$service->addTicker(function () use ($db) {
+  $db->table('drivers')
+    ->where('status', DriverStatus::IDLE)
+    ->where(function (Builder $query) {
+      $query
+        ->orWhere('last_updated_at', null)
+        ->orWhere('last_updated_at', '<',
+          Clock::current()->sub(new DateInterval('PT60S'))
+            ->format('Y-m-d H:i:s')
+        );
+    })
+    ->update([
+      'status' => DriverStatus::OFF,
+    ]);
+});
+/*------------------------------------------------------------------------*/
+
+/*------------------------------------------------------------------------*/
+/* Drivers and orders check */
 $service->addTicker(function () use ($db, $maps, $deserializer) {
   $db->transaction(function () use ($db, $maps, $deserializer) {
 //    $mem = [];

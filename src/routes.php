@@ -144,6 +144,9 @@ $app->group('/api/v1', function () use ($app) { // api
     $app->get('/dashboard', DriverController::class.':dashboard');
     $app->post('/report-location', DriverController::class.':reportLocation');
 
+    $app->post('/on', DriverController::class.':on');
+    $app->post('/off', DriverController::class.':off');
+
     $app->post('/do-order/{id}', DriverController::class.':doOrder');
 
     $app->post('/cancel-order', DriverController::class.':cancelOrder');

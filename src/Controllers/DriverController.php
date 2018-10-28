@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Services\ResourcesService;
+use App\Util\Clock;
 use App\Util\DriverStatus;
 use App\Util\OrderStatus;
 use Illuminate\Database\Capsule\Manager as DB;
@@ -48,45 +49,49 @@ class DriverController extends Controller {
       'status' => $driver['status'],
     ];
     switch ($driver['status']) {
-      case 'ready':
-        $orders = $this->db->table('orders')
-          ->where('status', OrderStatus::WAITING_FOR_DRIVER)
-          ->orderBy('created_at', 'asc')
-          ->take(25)
-          ->get()
-        ;
-
-        $courses = $this->db->table('orders_courses')
-          ->whereIn('order_id', $orders->pluck('id'))
-          ->get()
-          ->mapToGroups(function (array $course) {
-            return [
-              intval($course['order_id']) => [
-                intval($course['course_id']) => intval($course['count']),
-              ],
-            ];
-          })
-          ->map(function (Collection $group) {
-            return $group->mapWithKeys(function (array $it) {
-              return $it;
-            });
-          })
-        ;
-
-        $result['orders'] = $orders->map(function (array $order) use ($courses) {
-          $order = $this->resources->getResourceProvider('order')->fromDB($order);
-
-          return array_merge(
-            $order,
-            [
-              'courses' => $courses[$order['id']],
-            ]
-          );
-        });
+      case 'off':
         break;
+
       case 'driving':
         $result['driver'] = $driver;
         $result['order'] = $this->resources->get('order', $driver['order_id']);
+        break;
+
+      case 'idle':
+//        $orders = $this->db->table('orders')
+//          ->where('status', OrderStatus::WAITING_FOR_DRIVER)
+//          ->orderBy('created_at', 'asc')
+//          ->take(25)
+//          ->get()
+//        ;
+//
+//        $courses = $this->db->table('orders_courses')
+//          ->whereIn('order_id', $orders->pluck('id'))
+//          ->get()
+//          ->mapToGroups(function (array $course) {
+//            return [
+//              intval($course['order_id']) => [
+//                intval($course['course_id']) => intval($course['count']),
+//              ],
+//            ];
+//          })
+//          ->map(function (Collection $group) {
+//            return $group->mapWithKeys(function (array $it) {
+//              return $it;
+//            });
+//          })
+//        ;
+//
+//        $result['orders'] = $orders->map(function (array $order) use ($courses) {
+//          $order = $this->resources->getResourceProvider('order')->fromDB($order);
+//
+//          return array_merge(
+//            $order,
+//            [
+//              'courses' => $courses[$order['id']],
+//            ]
+//          );
+//        });
         break;
     }
 
@@ -110,6 +115,40 @@ class DriverController extends Controller {
       ], [
         'latitude' => $lat,
         'longitude' => $lng,
+        'last_updated_at' => Clock::current()->format('Y-m-d H:i:s'),
+      ]);
+
+    return $response->withJson([
+      'status' => 'ok',
+    ]);
+  }
+
+  public function on(Request $request, Response $response, array $args) {
+    $this->assertAbility($request, $response, 'driver');
+    $user = $this->getUser($request);
+    $driver = $this->getDriver($user['id']);
+
+    $this->db->table('drivers')
+      ->where('driver_id', $user['id'])
+      ->where('status', DriverStatus::OFF)
+      ->update([
+        'status' => DriverStatus::IDLE,
+      ]);
+
+    return $response->withJson([
+      'status' => 'ok',
+    ]);
+  }
+
+  public function off(Request $request, Response $response, array $args) {
+    $this->assertAbility($request, $response, 'driver');
+    $user = $this->getUser($request);
+    $driver = $this->getDriver($user['id']);
+
+    $this->db->table('drivers')
+      ->where('driver_id', $user['id'])
+      ->update([
+        'status' => DriverStatus::OFF,
       ]);
 
     return $response->withJson([
