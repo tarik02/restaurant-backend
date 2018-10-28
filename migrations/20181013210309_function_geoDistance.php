@@ -9,6 +9,8 @@ class FunctionGeoDistance extends Migration {
     Capsule::connection()->unprepared(
       <<<SQL
 CREATE FUNCTION `geoDistance`(p1lat DOUBLE, p1lng DOUBLE, p2lat DOUBLE, p2lng DOUBLE) RETURNS DOUBLE
+READS SQL DATA
+DETERMINISTIC
 BEGIN
   SET @R = 6378137; -- Earth’s mean radius in meter
   
