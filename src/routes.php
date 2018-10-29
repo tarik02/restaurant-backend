@@ -137,6 +137,7 @@ $app->group('/api/v1', function () use ($app) { // api
     $app->get('/income', StatsController::class.':income');
     $app->get('/ingredients', StatsController::class.':ingredients');
     $app->get('/ingredients/outdated', StatsController::class.':ingredientsOutdated');
+    $app->get('/orders', StatsController::class.':orders');
 
   });
 

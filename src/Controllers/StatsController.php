@@ -187,4 +187,37 @@ SQL
 
     return $response->withJson($stats);
   }
+
+  public function orders(Request $request, Response $response, array $args) {
+    $this->assertAbility($request, $response, 'stats');
+
+    $dayOfWeek = $request->getParam('dayOfWeek') === 'true';
+    $since = $this->deserializer->dateTime($this->assert($response, $request->getParam('since')));
+    $until = $this->deserializer->dateTime($this->assert($response, $request->getParam('until')));
+
+    $stats = collect($this->db->select(str_replace(
+      'DATEFUNCTION',
+      $dayOfWeek ? 'DAYOFWEEK' : 'DATE',
+      <<<SQL
+    SELECT
+      DATEFUNCTION(orders.created_at) as day,
+      COUNT(orders.id) as count
+    FROM orders
+    WHERE
+      orders.status = :orderStatus AND
+      DATE(orders.created_at) BETWEEN :since AND :until
+    GROUP BY day
+SQL
+    ), [
+      'orderStatus' => OrderStatus::DONE,
+      'since' => $since->format('Y-m-d'),
+      'until' => $until->format('Y-m-d'),
+    ]))
+      ->mapWithKeys(function (array $data) {
+        return [$data['day'] => intval($data['count'])];
+      })
+    ;
+
+    return $response->withJson($stats);
+  }
 }
