@@ -1,0 +1,1 @@
+INSERT INTO storages (id, name, latitude, longitude, address) VALUES (1, 'м. Луцьк', 50.74262168790266, 25.31235148828125, null);

@@ -101,6 +101,14 @@ class InstallController extends Controller {
     );
 
     try {
+      {
+        $command = new \Phpmig\Console\Command\MigrateCommand();
+        $command->run(
+          new ArgvInput([]),
+          new NullOutput()
+        );
+      }
+
       /** @var Connection $conn */
       $conn = $this->container['db']->getConnection();
     } catch (\Throwable $e) {
@@ -112,16 +120,8 @@ class InstallController extends Controller {
         'reason' => 'wrong-db-credentials',
       ]);
     }
-
     try {
       $conn->beginTransaction();
-      {
-        $command = new \Phpmig\Console\Command\MigrateCommand();
-        $command->run(
-          new ArgvInput([]),
-          new NullOutput()
-        );
-      }
 
       /** @var UsersService $users */
       $users = $this->container['users'];
@@ -159,10 +159,15 @@ SQL
       );
 
       if ($db['autofill']) {
-        $sql = file_get_contents(resources_path() . '/default.sql');
-        $sql = trim($sql);
-        if ($sql !== '') {
-          $pdo->exec($sql);
+        foreach (scandir($root = resources_path() . '/seeder') as $file) {
+          if ($file === '.' || $file === '..') {
+            continue;
+          }
+          $sql = file_get_contents($root . '/' . $file);
+          $sql = trim($sql);
+          if ($sql !== '') {
+            $pdo->exec($sql);
+          }
         }
       }
 

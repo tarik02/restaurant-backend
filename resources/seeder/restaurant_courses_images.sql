@@ -1,0 +1,12 @@
+INSERT INTO courses_images (course_id, src) VALUES (17, '/20181020/1540017983-picture.jpg');
+INSERT INTO courses_images (course_id, src) VALUES (13, '/20181018/1539855061-depositphotos_140067562-stock-photo-fried-frog-legs-on-plate.jpg');
+INSERT INTO courses_images (course_id, src) VALUES (11, '/20181018/1539853877-4421bcf0dbe0a79b57d4c5b84e69b4024a4f06dd.jpg');
+INSERT INTO courses_images (course_id, src) VALUES (10, '/20181018/1539853458-primebeefdenversteak_500_306_5_100.png');
+INSERT INTO courses_images (course_id, src) VALUES (5, '/20181018/1539847650-thumb_STRAWBERRY.png');
+INSERT INTO courses_images (course_id, src) VALUES (3, '/20181015/1539623839-ekbG0r5gGL.jpg');
+INSERT INTO courses_images (course_id, src) VALUES (2, '/20180921/1537527018-kartoplya-frі-v-domashnіx-umovax.jpg');
+INSERT INTO courses_images (course_id, src) VALUES (7, '/20181018/1539849869-p_O.jpg');
+INSERT INTO courses_images (course_id, src) VALUES (4, '/20181018/1539845966-62fb50fced02a0339f4fabf31874e046.jpeg');
+INSERT INTO courses_images (course_id, src) VALUES (9, '/20181018/1539850811-orig_30141_0_xxl.jpg');
+INSERT INTO courses_images (course_id, src) VALUES (8, '/20181018/1539850459-makarony-po-flotski.jpg');
+INSERT INTO courses_images (course_id, src) VALUES (12, '/20181018/1539854947-m’yasnij-pirіg-bіf-vellіngton.jpg');
