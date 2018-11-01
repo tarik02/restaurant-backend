@@ -161,8 +161,7 @@ SQL
       ingredients.title as ingredient,
       ingredients.unit as unit,
       ROUND(SUM(storages_batches.remaining), 1) as count
-    FROM storages_batches_old
-    LEFT JOIN storages_batches ON storages_batches.id = storages_batches_old.id
+    FROM storages_batches
     LEFT JOIN ingredients ON ingredients.id = storages_batches.ingredient_id
     WHERE
       DATE(storages_batches.best_by) BETWEEN :since AND :until
