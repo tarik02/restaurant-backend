@@ -61,7 +61,8 @@ class InstallController extends Controller {
       case 'mysql':
         $env['DB_HOST'] = $connection['host'];
         $env['DB_PORT'] = intval($connection['port']);
-        $env['DB_DATABASE'] = $connection['database'];
+        $env['DB_DATABASE'] = 'restaurant';
+//        $env['DB_DATABASE'] = $connection['database'];
         $env['DB_USERNAME'] = $connection['user'];
         $env['DB_PASSWORD'] = $connection['password'];
         break;
@@ -101,13 +102,13 @@ class InstallController extends Controller {
     );
 
     try {
-      {
-        $command = new \Phpmig\Console\Command\MigrateCommand();
-        $command->run(
-          new ArgvInput([]),
-          new NullOutput()
-        );
-      }
+//      {
+//        $command = new \Phpmig\Console\Command\MigrateCommand();
+//        $command->run(
+//          new ArgvInput([]),
+//          new NullOutput()
+//        );
+//      }
 
       /** @var Connection $conn */
       $conn = $this->container['db']->getConnection();
@@ -144,32 +145,32 @@ class InstallController extends Controller {
         ]);
       }
 
-      $pdo = $conn->getPdo();
-      $pdo->exec(<<<SQL
-REPLACE INTO
-  oauth_clients (client_id, client_secret, grant_types)
-VALUES
-  ('default', '2dc4cf2028d0ef0f209e9d807046de9203ab7366eb4a0f4ca4a1793ae9b75592', 'password');
-
-REPLACE INTO
-  oauth_clients (client_id, client_secret, grant_types)
-VALUES
-  ('emulator', '2dc4cf2028d0ef0f209e9d807046de9203ab7366eb4a0f4ca4a1793ae9b75595', 'emulator');
-SQL
-      );
-
-      if ($db['autofill']) {
-        foreach (scandir($root = resources_path() . '/seeder') as $file) {
-          if ($file === '.' || $file === '..') {
-            continue;
-          }
-          $sql = file_get_contents($root . '/' . $file);
-          $sql = trim($sql);
-          if ($sql !== '') {
-            $pdo->exec($sql);
-          }
-        }
-      }
+//      $pdo = $conn->getPdo();
+//      $pdo->exec(<<<SQL
+//REPLACE INTO
+//  oauth_clients (client_id, client_secret, grant_types)
+//VALUES
+//  ('default', '2dc4cf2028d0ef0f209e9d807046de9203ab7366eb4a0f4ca4a1793ae9b75592', 'password');
+//
+//REPLACE INTO
+//  oauth_clients (client_id, client_secret, grant_types)
+//VALUES
+//  ('emulator', '2dc4cf2028d0ef0f209e9d807046de9203ab7366eb4a0f4ca4a1793ae9b75595', 'emulator');
+//SQL
+//      );
+//
+//      if ($db['autofill']) {
+//        foreach (scandir($root = resources_path() . '/seeder') as $file) {
+//          if ($file === '.' || $file === '..') {
+//            continue;
+//          }
+//          $sql = file_get_contents($root . '/' . $file);
+//          $sql = trim($sql);
+//          if ($sql !== '') {
+//            $pdo->exec($sql);
+//          }
+//        }
+//      }
 
       @unlink($fileEnvTmp);
       $conn->commit();
