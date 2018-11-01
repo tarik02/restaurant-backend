@@ -165,6 +165,7 @@ SQL
     LEFT JOIN ingredients ON ingredients.id = storages_batches.ingredient_id
     WHERE
       DATE(storages_batches.best_by) BETWEEN :since AND :until
+      AND count <> 0
     GROUP BY day, ingredients.id
 SQL
     , [
